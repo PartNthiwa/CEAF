@@ -4,14 +4,19 @@
 namespace App\Livewire\Member;
 
 use Livewire\Component;
+use Livewire\WithPagination;
+
 use Illuminate\Support\Facades\Auth;
 
 class Dashboard extends Component
 {
 
+    use WithPagination;
     public $membershipStatus;
     public $amountDue = null;     
     public $nextDeadline = null; 
+
+    protected $paginationTheme = 'tailwind'; 
 
     public function mount()
     {
@@ -31,10 +36,23 @@ class Dashboard extends Component
             $this->nextDeadline = $payment->paymentCycle->due_date;
         }
     }
-
-    public function render()
+   public function render()
     {
-        return view('livewire.member.dashboard')
-         ->layout('layouts.app');
+        $user = auth()->user();
+
+        $dependents = $user->dependents()->latest()->paginate(5);
+
+        return view('livewire.member.dashboard', [
+            'membershipStatus' => $user->membership_status,
+            'amountDue' => $user->amount_due,
+            'nextDeadline' => $user->next_deadline,
+            'dependents' => $dependents,
+            'dependentsCount' => $user->dependents()->count(),
+            'activeDependents' => $user->dependents()->where('status', 'active')->count(),
+            'deceasedDependents' => $user->dependents()->where('status', 'deceased')->count(),
+            'beneficiariesCount' => $user->beneficiaries()->count(),
+            'pendingBeneficiaryChanges' => $user->beneficiaryChangeRequests()->where('status', 'pending')->count(),
+        ])->layout('layouts.app');
     }
+
 }

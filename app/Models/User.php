@@ -71,9 +71,24 @@ class User extends Authenticatable
     {
         return $this->role === 'member';
     }
-    public function member()
+
+    public function dependents()
     {
-        return $this->hasOne(\App\Models\Member::class);
+        return $this->hasMany(Dependent::class, 'member_id');
     }
 
+      public function beneficiaries()
+    {
+        return $this->hasMany(Beneficiary::class, 'member_id');
+    }
+
+      public function beneficiaryChangeRequests()
+    {
+        return $this->hasMany(BeneficiaryChangeRequest::class, 'member_id');
+    }
+
+    public function member()
+    {
+        return $this->hasOne(Member::class);
+    }
 }

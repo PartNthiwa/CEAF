@@ -11,6 +11,7 @@ class Dependent extends Model
         'member_id',
         'name',
         'relationship',
+        'profile_completed',
         'status',
     ];
 
@@ -36,4 +37,10 @@ class Dependent extends Model
     {
         return $this->status === 'deceased';
     }
+
+    public function documents()
+    {
+        return $this->hasMany(DependentDocument::class);
+    }
+
 }

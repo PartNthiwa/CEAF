@@ -7,7 +7,7 @@ use App\Livewire\Member\Payments as MemberPayments;
 use App\Livewire\Member\Dependents as MemberDependents;
 use App\Livewire\Member\Beneficiaries as MemberBeneficiaries;
 use App\Livewire\Member\Profile as MemberProfile;
-
+use App\Livewire\Member\DependentProfile;
 
 use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\ConfigurationManager;
@@ -60,7 +60,14 @@ Route::middleware(['auth'])->prefix('member')->name('member.')->group(function (
     // Beneficiaries Management
     Route::get('/beneficiaries', MemberBeneficiaries::class)->name('beneficiaries');
 
+    
 });
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dependent/{dependentId}/profile', DependentProfile::class)
+        ->name('dependents.profile');
+});
+
 /*
 |--------------------------------------------------------------------------
 | Admin Routes
