@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Livewire\Admin;
 
 use Livewire\Component;
@@ -16,7 +17,6 @@ class Dashboard extends Component
     public function mount()
     {
         $this->totalMembers = Member::count();
-
         $this->activeMembers = Member::where('membership_status', 'active')->count();
         $this->lateMembers = Member::where('membership_status', 'late')->count();
         $this->suspendedMembers = Member::where('membership_status', 'suspended')->count();

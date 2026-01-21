@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Livewire\Member;
 
 use Livewire\Component;
@@ -9,12 +10,26 @@ class Dashboard extends Component
 {
 
     public $membershipStatus;
+    public $amountDue = null;     
+    public $nextDeadline = null; 
 
     public function mount()
     {
-        $this->membershipStatus = Auth::user()
-            ->member
-            ->membership_status;
+        $member = auth()->user()->member;
+
+        $this->membershipStatus = $member->membership_status ?? 'unknown';
+
+        // Load current seed payment cycle for this member
+        $payment = \App\Models\Payment::where('member_id', $member->id ?? 0)
+            ->whereHas('paymentCycle', function ($q) {
+                $q->where('type', 'seed')
+                  ->where('year', now()->year);
+            })->first();
+
+        if ($payment) {
+            $this->amountDue = $payment->amount_due + $payment->late_fee;
+            $this->nextDeadline = $payment->paymentCycle->due_date;
+        }
     }
 
     public function render()

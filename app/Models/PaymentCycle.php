@@ -32,4 +32,11 @@ class PaymentCycle extends Model
     {
         return $this->status === 'open';
     }
+
+
+    public function isLateWindowPassed(): bool
+    {
+        return now()->greaterThan(\Carbon\Carbon::parse($this->late_deadline));
+    }
+
 }

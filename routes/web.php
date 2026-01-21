@@ -2,8 +2,16 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Member\Dashboard as MemberDashboard;
+
+use App\Livewire\Member\Payments as MemberPayments;
+use App\Livewire\Member\Dependents as MemberDependents;
+use App\Livewire\Member\Beneficiaries as MemberBeneficiaries;
+use App\Livewire\Member\Profile as MemberProfile;
+
+
 use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\ConfigurationManager;
+use App\Livewire\Admin\SeedPaymentCycleManager;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,6 +44,23 @@ Route::middleware(['auth'])->group(function () {
     })->name('profile');
 });
 
+
+Route::middleware(['auth'])->prefix('member')->name('member.')->group(function () {
+
+
+    // Profile
+    Route::get('/profile', MemberProfile::class)->name('profile');
+
+    // Payments
+    Route::get('/payments', MemberPayments::class)->name('payments');
+
+    // Dependents Management
+    Route::get('/dependents', MemberDependents::class)->name('dependents');
+
+    // Beneficiaries Management
+    Route::get('/beneficiaries', MemberBeneficiaries::class)->name('beneficiaries');
+
+});
 /*
 |--------------------------------------------------------------------------
 | Admin Routes
@@ -48,8 +73,12 @@ Route::middleware(['auth', 'admin'])
     ->group(function () {
         Route::get('/dashboard', AdminDashboard::class)
             ->name('dashboard');
+     
+        Route::get('/configuration', ConfigurationManager::class)
+            ->name('configuration');
+        Route::get('/seed-cycle',SeedPaymentCycleManager::class)
+            ->name('seed-cycle');
+
     });
-     Route::get('/configuration', ConfigurationManager::class)
-        ->name('admin.configuration');
 
 require __DIR__.'/auth.php';

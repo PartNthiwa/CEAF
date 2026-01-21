@@ -8,11 +8,20 @@
         <a href="{{ route('admin.configuration') }}"
            class="px-3 py-1 rounded bg-blue-200  hover:bg-blue-300">Configuration</a>
 
-        <!-- Add more admin links here later if needed -->
+        <a href="{{ route('admin.seed-cycle') }}"
+           class="px-3 py-1 rounded bg-blue-200  hover:bg-blue-300">Payment Cycles</a>
     </div>
 
     <!-- Page Title -->
     <h2 class="text-xl font-bold mb-4">Admin Dashboard</h2>
+
+    <!-- Enforce Late Payments Button -->
+    <div class="mb-4">
+        <button wire:click="enforceLatePayments"
+                class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+            Enforce Late Payments
+        </button>
+    </div>
 
     <!-- Stats -->
     <ul class="space-y-2">

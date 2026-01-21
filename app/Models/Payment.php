@@ -34,4 +34,23 @@ class Payment extends Model
     {
         return $this->status === 'paid';
     }
+
+    public function calculateAmountDue(): int
+    {
+        $amount = $this->amount_due;
+
+        $lateFeeType = $this->paymentCycle->late_fee_type ?? 'flat';
+        $lateFeeValue = $this->paymentCycle->late_fee_value ?? 0;
+
+        if ($this->status === 'pending' && now()->greaterThan($this->paymentCycle->due_date)) {
+            if ($lateFeeType === 'flat') {
+                $amount += $lateFeeValue;
+            } elseif ($lateFeeType === 'percentage') {
+                $amount += ceil($amount * ($lateFeeValue / 100));
+            }
+        }
+
+        return $amount;
+    }
+
 }
