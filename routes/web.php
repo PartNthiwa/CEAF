@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Member\Dashboard as MemberDashboard;
 use App\Livewire\Admin\Dashboard as AdminDashboard;
+use App\Livewire\Admin\ConfigurationManager;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,5 +49,7 @@ Route::middleware(['auth', 'admin'])
         Route::get('/dashboard', AdminDashboard::class)
             ->name('dashboard');
     });
+     Route::get('/configuration', ConfigurationManager::class)
+        ->name('admin.configuration');
 
 require __DIR__.'/auth.php';
