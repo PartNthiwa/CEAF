@@ -9,14 +9,6 @@
                class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg shadow-sm transition">
                 Make Payment
             </a>
-            <!-- <a href="{{ route('member.dependents') }}"
-               class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium px-4 py-2 rounded-lg shadow-sm transition">
-                Manage Dependents
-            </a>
-            <a href="{{ route('member.beneficiaries') }}"
-               class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium px-4 py-2 rounded-lg shadow-sm transition">
-                Manage Beneficiaries
-            </a> -->
         </div>
     </div>
 

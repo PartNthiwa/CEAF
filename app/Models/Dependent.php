@@ -43,4 +43,8 @@ class Dependent extends Model
         return $this->hasMany(DependentDocument::class);
     }
 
+    public function isLocked(): bool
+    {
+        return $this->isDeceased();
+    }
 }

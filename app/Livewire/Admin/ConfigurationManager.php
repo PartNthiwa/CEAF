@@ -36,6 +36,6 @@ class ConfigurationManager extends Component
     {
         $configurations = Configuration::all();
         return view('livewire.admin.configuration-manager', ['configurations' => $configurations])  
-        ->layout('layouts.app');
+        ->layout('layouts.admin');
     }
 }

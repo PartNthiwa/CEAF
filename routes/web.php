@@ -12,6 +12,7 @@ use App\Livewire\Member\DependentProfile;
 use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\ConfigurationManager;
 use App\Livewire\Admin\SeedPaymentCycleManager;
+use App\Livewire\Admin\BeneficiaryRequests;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,10 +26,17 @@ Route::view('/', 'welcome');
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->get('/dashboard', function () {
-    return auth()->user()->isAdmin()
-        ? redirect()->route('admin.dashboard')
-        : redirect()->route('member.dashboard');
+
+    $user = auth()->user();
+
+    if ($user->role === 'admin') {
+        return redirect()->route('admin.dashboard');
+    }
+
+    return redirect()->route('member.dashboard');
+
 })->name('dashboard');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -78,14 +86,14 @@ Route::middleware(['auth', 'admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-        Route::get('/dashboard', AdminDashboard::class)
-            ->name('dashboard');
-     
-        Route::get('/configuration', ConfigurationManager::class)
-            ->name('configuration');
-        Route::get('/seed-cycle',SeedPaymentCycleManager::class)
-            ->name('seed-cycle');
+        Route::get('/dashboard', AdminDashboard::class)->name('dashboard');     
+        Route::get('/configuration', ConfigurationManager::class)->name('configuration');
+        Route::get('/seed-cycle',SeedPaymentCycleManager::class)->name('seed-cycle');    
+        Route::get('/beneficiary-requests', BeneficiaryRequests::class)->name('beneficiary.requests');
+
 
     });
+
+    
 
 require __DIR__.'/auth.php';

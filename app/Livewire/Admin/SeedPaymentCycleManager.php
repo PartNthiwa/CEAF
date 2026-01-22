@@ -102,6 +102,6 @@ class SeedPaymentCycleManager extends Component
     public function render()
     {
         return view('livewire.admin.seed-payment-cycle-manager')
-            ->layout('layouts.app', ['title' => 'Seed Payment Cycle Manager']);
+            ->layout('layouts.admin', ['title' => 'Seed Payment Cycle Manager']);
     }
 }

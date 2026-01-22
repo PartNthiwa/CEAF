@@ -20,13 +20,15 @@
 
             <flux:spacer />
 
-            <flux:sidebar.nav>
-                <flux:sidebar.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                    {{ __('Repository') }}
+          <flux:sidebar.nav>
+                {{-- Repository --}}
+                <flux:sidebar.item icon="folder-git-2" href="https://github.com/your-org/your-repo" target="_blank">
+                    {{ config('app.name', 'CEAF') }} Repository
                 </flux:sidebar.item>
 
-                <flux:sidebar.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                    {{ __('Documentation') }}
+                {{-- Documentation --}}
+                <flux:sidebar.item icon="book-open-text" href="https://your-app-docs.com" target="_blank">
+                    {{ config('app.name', 'CEAF') }} Docs
                 </flux:sidebar.item>
             </flux:sidebar.nav>
 
