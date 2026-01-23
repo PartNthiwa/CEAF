@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Dependent extends Model
@@ -24,11 +25,13 @@ class Dependent extends Model
 
     // ─── Guards ────────────────────────────────────
 
-    protected static function booted()
+   protected static function booted()
     {
         static::updating(function ($dependent) {
             if ($dependent->getOriginal('status') === 'deceased') {
-                throw new \Exception('Deceased dependents cannot be modified.');
+                throw ValidationException::withMessages([
+                    'status' => 'This dependent is marked as deceased and cannot be modified.',
+                ]);
             }
         });
     }

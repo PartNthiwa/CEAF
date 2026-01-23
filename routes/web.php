@@ -11,6 +11,9 @@ use App\Livewire\Member\DependentProfile;
 
 use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\ConfigurationManager;
+use App\Livewire\Admin\PaymentsManager;
+use App\Livewire\Admin\DependentsManager;
+use App\Livewire\Admin\BeneficiariesManager;
 use App\Livewire\Admin\SeedPaymentCycleManager;
 use App\Livewire\Admin\BeneficiaryRequests;
 
@@ -92,6 +95,9 @@ Route::middleware(['auth', 'admin'])
         Route::get('/beneficiary-requests', BeneficiaryRequests::class)->name('beneficiary.requests');
 
 
+      Route::get('/payments', PaymentsManager::class)->name('payments');
+        Route::get('/dependents', DependentsManager::class)->name('dependents');
+        Route::get('/beneficiaries', BeneficiariesManager::class)->name('beneficiaries');
     });
 
     

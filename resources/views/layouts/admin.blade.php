@@ -19,13 +19,47 @@
     {{-- Navigation --}}
     <nav class="flex-1 px-4 py-6 space-y-2">
         {{-- Dashboard --}}
-        <a href="{{ route('admin.dashboard') }}" class="flex items-center px-3 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('admin.dashboard') ? 'bg-gray-200 font-semibold' : '' }}">
+        <a href="{{ route('admin.dashboard') }}" class="flex items-center px-3 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('admin.dashboard') ? 'bg-green-200 font-semibold' : '' }}">
             {{-- Icon --}}
             <svg class="h-5 w-5 mr-2 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7m-9 9v-6h4v6m5 0H5a2 2 0 01-2-2V7a2 2 0 012-2h2"/>
             </svg>
             Dashboard
         </a>
+{{-- Members Menu --}}
+<div x-data="{ open: {{ request()->routeIs('admin.payments') || request()->routeIs('admin.dependents') || request()->routeIs('admin.beneficiaries') ? 'true' : 'false' }} }">
+    <button @click="open = !open" 
+            class="flex items-center justify-between w-full px-3 py-2 rounded hover:bg-gray-200
+                   {{ request()->routeIs('admin.payments') || request()->routeIs('admin.dependents') || request()->routeIs('admin.beneficiaries') ? 'bg-green-200 font-semibold' : '' }}">
+        <div class="flex items-center">
+            {{-- Icon for Members --}}
+            <svg class="h-5 w-5 mr-2 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            Members
+        </div>
+        <svg :class="{'rotate-90': open}" class="h-4 w-4 transition-transform" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+    </button>
+
+    {{-- Submenu --}}
+    <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
+        <a href="{{ route('admin.payments') }}" 
+           class="block px-3 py-2 text-sm rounded hover:bg-gray-100 {{ request()->routeIs('admin.payments') ? 'bg-green-100 font-semibold' : '' }}">
+            Payments
+        </a>
+        <a href="{{ route('admin.dependents') }}" 
+           class="block px-3 py-2 text-sm rounded hover:bg-gray-100 {{ request()->routeIs('admin.dependents') ? 'bg-green-100 font-semibold' : '' }}">
+            Dependents
+        </a>
+        <a href="{{ route('admin.beneficiaries') }}" 
+           class="block px-3 py-2 text-sm rounded hover:bg-gray-100 {{ request()->routeIs('admin.beneficiaries') ? 'bg-green-100 font-semibold' : '' }}">
+            Beneficiaries
+        </a>
+    </div>
+</div>
+
 
         {{-- Configuration --}}
         <a href="{{ route('admin.configuration') }}" class="flex items-center px-3 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('admin.configuration') ? 'bg-gray-200 font-semibold' : '' }}">
@@ -71,6 +105,9 @@
                 <a href="{{ route('admin.dashboard') }}" class="block px-3 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('admin.dashboard') ? 'bg-gray-200 font-semibold' : '' }}">
                     Dashboard
                 </a>
+                 <a href="{{ route('admin.configuration') }}" class="block px-3 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('admin.configuration') ? 'bg-gray-200 font-semibold' : '' }}">
+                    Members
+                </a>
                 <a href="{{ route('admin.configuration') }}" class="block px-3 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('admin.configuration') ? 'bg-gray-200 font-semibold' : '' }}">
                     Configuration
                 </a>
@@ -89,13 +126,30 @@
 
         {{-- MAIN CONTENT AREA --}}
         <div class="flex-1 flex flex-col">
-            {{-- HEADER --}}
-            <header class="bg-white border-b px-6 py-4 flex justify-between items-center">
+           {{-- HEADER --}}
+            <header class="bg-white border-b px-6 py-3 flex justify-between items-center">
                 <div class="text-xl font-semibold">Admin Panel</div>
-                <div class="lg:hidden">
-                    <span>{{ auth()->user()->name }}</span>
+                {{-- Left side: Breadcrumb --}}
+                <div class="text-gray-700 text-sm font-medium">
+                    Home
+                    @if(request()->routeIs('admin.dashboard'))
+                        &gt; Dashboard
+                    @elseif(request()->routeIs('admin.configuration'))
+                        &gt; Configuration
+                    @elseif(request()->routeIs('admin.seed-cycle'))
+                        &gt; Payment Cycles
+                    @elseif(request()->routeIs('admin.beneficiary.requests'))
+                        &gt; Beneficiary Requests
+                    @endif
+                </div>
+
+                {{-- Right side: optional user name for mobile --}}
+                <div class="lg:hidden text-gray-600 text-sm font-medium">
+                    {{ auth()->user()->name }}
                 </div>
             </header>
+
+
 
             {{-- PAGE CONTENT (centered) --}}
             <main class="flex-1 p-6  mx-auto w-full">

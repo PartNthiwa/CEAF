@@ -5,14 +5,13 @@
    <div class="flex items-center justify-between">
     <h2 class="text-2xl font-bold text-gray-800">My Beneficiaries</h2>
 
-    <button
-        wire:click="openModal"
-        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition">
-        + Add Beneficiary
-    </button>
+<button wire:click="openModal"
+    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition">
+    + Add Beneficiary
+</button>
 
-    <button wire:click="enableChangeRequest"
-        class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg">
+<button wire:click="enableChangeRequest"
+    class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg">
     Request Beneficiary Change
 </button>
 
@@ -22,6 +21,17 @@
 @endphp
 
 <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+
+    @if($pendingChangeRequest)
+        <div class="mb-4 rounded-xl bg-yellow-50 border border-yellow-200 p-4">
+            <div class="flex items-center gap-2 text-yellow-800 font-medium">
+                ⏳ Beneficiary change request under review
+            </div>
+            <p class="text-sm text-yellow-700 mt-1">
+                Your requested changes will reflect once approved.
+            </p>
+        </div>
+    @endif
 
     {{-- Header --}}
     <div class="px-6 py-4 border-b flex items-center justify-between">
@@ -122,8 +132,8 @@
 
         {{-- Modal Header --}}
         <div class="flex items-center justify-between px-6 py-4 border-b">
-            <h3 class="text-lg font-semibold text-gray-800">
-                Add Beneficiary
+           <h3 class="text-lg font-semibold text-gray-800">
+                {{ $changeMode ? 'Request Beneficiary Change' : 'Add Beneficiary' }}
             </h3>
 
             <button wire:click="closeModal"
@@ -133,22 +143,34 @@
         </div>
 
         {{-- Modal Body --}}
-        <form wire:submit.prevent="submit" class="p-6 space-y-5">
+      <form 
+        wire:submit.prevent="{{ $changeMode ? 'submitChangeRequest' : 'submit' }}" 
+        class="p-6 space-y-5"
+    >
 
             {{-- Dependent --}}
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     Select Dependent (Optional)
                 </label>
-                <select wire:model="selectedDependent"
-                        class="w-full rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                    <option value="">— Choose dependent —</option>
-                    @foreach($dependents as $d)
-                        <option value="{{ $d->id }}" @disabled($d->status === 'deceased')>
-                            {{ $d->name }}
-                        </option>
-                    @endforeach
-                </select>
+          <select wire:model="selectedPerson" class="w-full rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+    <option value="">— Choose beneficiary or dependent —</option>
+
+    {{-- Existing beneficiaries --}}
+    @foreach($beneficiaries as $b)
+        <option value="beneficiary:{{ $b->id }}">
+            {{ $b->name }} (Existing Beneficiary)
+        </option>
+    @endforeach
+
+    {{-- Dependents --}}
+    @foreach($dependents as $d)
+        <option value="dependent:{{ $d->id }}" @disabled($d->status === 'deceased')>
+            {{ $d->name }} (Dependent)
+        </option>
+    @endforeach
+</select>
+
             </div>
 
             {{-- Manual Fields --}}
@@ -202,18 +224,13 @@
                     Cancel
                 </button>
 
-               <button type="submit"
-                    class="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold w-full"
-                    @if($this->remainingAllocation === 0) disabled class="opacity-50 cursor-not-allowed" @endif>
-                Save Beneficiary
+            <button type="submit"
+                class="px-5 py-2 rounded-lg {{ $changeMode ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-blue-600 hover:bg-blue-700' }} text-white font-semibold w-full">
+                {{ $changeMode ? 'Submit Change Request' : 'Save Beneficiary' }}
             </button>
 
-            </div>
 
-            {{-- Messages --}}
-            @if (session()->has('error'))
-                <p class="text-red-600 text-sm">{{ session('error') }}</p>
-            @endif
+            </div>
 
         </form>
     </div>
