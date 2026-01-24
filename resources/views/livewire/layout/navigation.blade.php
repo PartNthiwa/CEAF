@@ -62,6 +62,13 @@ new class extends Component
                     >
                         Beneficiaries
                     </x-nav-link>
+                     <x-nav-link
+                        :href="route('member.submit-event')"
+                        :active="request()->routeIs('member.submit-event')"
+                        wire:navigate
+                    >
+                        Events
+                    </x-nav-link>
 
                 </div>
 

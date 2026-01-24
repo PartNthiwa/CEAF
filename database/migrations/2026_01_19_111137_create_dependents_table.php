@@ -13,21 +13,13 @@ return new class extends Migration
     {
         Schema::create('dependents', function (Blueprint $table) {
             $table->id();
+
+            $table->foreignId('person_id')->nullable()->nullOnDelete();
             $table->foreignId('member_id')->constrained()->cascadeOnDelete();
 
             $table->string('name');
-
-            $table->enum('relationship', [
-                'parent',
-                'sibling',
-                'child',
-            ]);
-
-            $table->enum('status', [
-                'active',
-                'deceased',
-            ])->default('active');
-
+            $table->enum('relationship', ['parent','sibling', 'child', ]);
+            $table->enum('status', ['active','deceased',])->default('active');
             $table->timestamps();
         });
 

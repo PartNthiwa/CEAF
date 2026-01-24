@@ -16,6 +16,8 @@ use App\Livewire\Admin\DependentsManager;
 use App\Livewire\Admin\BeneficiariesManager;
 use App\Livewire\Admin\SeedPaymentCycleManager;
 use App\Livewire\Admin\BeneficiaryRequests;
+use App\Livewire\Member\SubmitEvent;
+use App\Livewire\Admin\ReviewEvents;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,31 +49,17 @@ Route::middleware(['auth'])->get('/dashboard', function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->group(function () {
-    Route::get('/member/dashboard', MemberDashboard::class)
-        ->name('member.dashboard');
-
-    Route::get('/profile', function () {
-        return view('profile');
-    })->name('profile');
+    Route::get('/member/dashboard', MemberDashboard::class)->name('member.dashboard');
+    Route::get('/profile', function () {return view('profile'); })->name('profile');
 });
 
-
 Route::middleware(['auth'])->prefix('member')->name('member.')->group(function () {
-
-
-    // Profile
     Route::get('/profile', MemberProfile::class)->name('profile');
-
-    // Payments
     Route::get('/payments', MemberPayments::class)->name('payments');
-
-    // Dependents Management
     Route::get('/dependents', MemberDependents::class)->name('dependents');
-
-    // Beneficiaries Management
     Route::get('/beneficiaries', MemberBeneficiaries::class)->name('beneficiaries');
 
-    
+    Route::get('/submit-event', SubmitEvent::class)->name('submit-event');
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -93,12 +81,13 @@ Route::middleware(['auth', 'admin'])
         Route::get('/configuration', ConfigurationManager::class)->name('configuration');
         Route::get('/seed-cycle',SeedPaymentCycleManager::class)->name('seed-cycle');    
         Route::get('/beneficiary-requests', BeneficiaryRequests::class)->name('beneficiary.requests');
-
-
-      Route::get('/payments', PaymentsManager::class)->name('payments');
+        Route::get('/payments', PaymentsManager::class)->name('payments');
         Route::get('/dependents', DependentsManager::class)->name('dependents');
         Route::get('/beneficiaries', BeneficiariesManager::class)->name('beneficiaries');
-    });
+    
+        Route::get('/review-events', ReviewEvents::class)->name('review-events');
+    
+        });
 
     
 

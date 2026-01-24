@@ -13,19 +13,14 @@ return new class extends Migration
     {
         Schema::create('events', function (Blueprint $table) {
             $table->id();
-
             $table->foreignId('member_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('dependent_id')->nullable()->constrained()->nullOnDelete();
-
             $table->enum('status', [
                 'submitted',
                 'under_review',
                 'approved',
                 'rejected',
             ])->default('submitted');
-
             $table->timestamp('approved_at')->nullable();
-
             $table->timestamps();
         });
 

@@ -10,7 +10,7 @@ class Event extends Model
 {
     protected $fillable = [
         'member_id',
-        'dependent_id',
+        'person_id',
         'status',
         'approved_at',
     ];
@@ -24,9 +24,9 @@ class Event extends Model
         return $this->belongsTo(Member::class);
     }
 
-    public function dependent(): BelongsTo
+    public function person(): BelongsTo
     {
-        return $this->belongsTo(Dependent::class);
+        return $this->belongsTo(Person::class);
     }
 
     public function documents(): HasMany

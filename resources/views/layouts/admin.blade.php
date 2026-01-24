@@ -45,10 +45,15 @@
 
     {{-- Submenu --}}
     <div x-show="open" x-transition class="ml-6 mt-1 space-y-1">
+         <a href="{{ route('admin.review-events') }}" 
+           class="block px-3 py-2 text-sm rounded hover:bg-gray-100 {{ request()->routeIs('admin.payments') ? 'bg-green-100 font-semibold' : '' }}">
+            Events
+        </a>
         <a href="{{ route('admin.payments') }}" 
            class="block px-3 py-2 text-sm rounded hover:bg-gray-100 {{ request()->routeIs('admin.payments') ? 'bg-green-100 font-semibold' : '' }}">
             Payments
         </a>
+
         <a href="{{ route('admin.dependents') }}" 
            class="block px-3 py-2 text-sm rounded hover:bg-gray-100 {{ request()->routeIs('admin.dependents') ? 'bg-green-100 font-semibold' : '' }}">
             Dependents

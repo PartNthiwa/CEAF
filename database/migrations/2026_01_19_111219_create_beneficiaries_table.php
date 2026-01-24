@@ -13,6 +13,7 @@ return new class extends Migration
     {
        Schema::create('beneficiaries', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('person_id')->nullable()->nullOnDelete();
             $table->foreignId('member_id')->constrained()->cascadeOnDelete();
 
             $table->string('name');
