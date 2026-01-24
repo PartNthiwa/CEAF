@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use App\Models\User;
+use App\Models\Person;
+use App\Observers\PersonObserver;
 use App\Observers\UserObserver;
 
 class AppServiceProvider extends ServiceProvider
@@ -27,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
         User::observe(UserObserver::class);
+        Person::observe(PersonObserver::class);
     }
 
     protected function configureDefaults(): void

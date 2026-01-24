@@ -78,4 +78,8 @@ class Dependent extends Model
     {
         return $this->isDeceased();
     }
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
 }

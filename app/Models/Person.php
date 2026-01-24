@@ -45,8 +45,35 @@ class Person extends Model
     {
         return !is_null($this->deceased_at);
     }
+     public function beneficiaries()
+    {
+        return $this->hasMany(Beneficiary::class, 'person_id');
+    }
 
-    public function getRolesLabelAttribute()
+   /* =========================
+       SCOPES
+    ========================== */
+
+  
+       public function scopeEligibleForEvent($query, $memberId)
+    {
+        return $query->where('member_id', $memberId)
+            ->alive()
+            ->whereDoesntHave('event');
+    }
+   public function scopeAlive($query)
+    {
+        return $query->whereNull('deceased_at')
+                    ->where('status', 'active');
+    }
+
+    
+
+       /* =========================
+         ACCESSORS
+    ========================== */
+
+      public function getRolesLabelAttribute()
     {
         $roles = [];
 
@@ -66,10 +93,6 @@ class Person extends Model
         return trim("{$this->first_name} {$this->last_name}");
     }
 
-    public function scopeAlive($query)
-    {
-        return $query->whereNull('deceased_at')
-                    ->where('status', 'active');
-    }
+ 
 
 }

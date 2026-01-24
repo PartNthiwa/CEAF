@@ -76,8 +76,13 @@ class SubmitEvent extends Component
 
     public function render()
     {
+       $memberId = auth()->user()->member->id;
+
         return view('livewire.member.submit-event', [
-            'persons' => $this->eligiblePersons,
+            'persons' => Person::eligibleForEvent($memberId)
+                ->with(['dependent', 'beneficiary'])
+                ->orderBy('first_name')
+                ->get(),
         ])->layout('layouts.app');
     }
 }

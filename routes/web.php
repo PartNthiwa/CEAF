@@ -18,6 +18,7 @@ use App\Livewire\Admin\SeedPaymentCycleManager;
 use App\Livewire\Admin\BeneficiaryRequests;
 use App\Livewire\Member\SubmitEvent;
 use App\Livewire\Admin\ReviewEvents;
+use App\Livewire\Member\EventHistory ;
 
 /*
 |--------------------------------------------------------------------------
@@ -60,6 +61,7 @@ Route::middleware(['auth'])->prefix('member')->name('member.')->group(function (
     Route::get('/beneficiaries', MemberBeneficiaries::class)->name('beneficiaries');
 
     Route::get('/submit-event', SubmitEvent::class)->name('submit-event');
+    Route::get('/event-history', EventHistory::class)->name('event-history');
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -86,7 +88,8 @@ Route::middleware(['auth', 'admin'])
         Route::get('/beneficiaries', BeneficiariesManager::class)->name('beneficiaries');
     
         Route::get('/review-events', ReviewEvents::class)->name('review-events');
-    
+        Route::get('/review-events/{eventId}', ReviewEvents::class)->name('review-events.detail');
+
         });
 
     

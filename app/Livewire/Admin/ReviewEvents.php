@@ -6,6 +6,15 @@ use App\Models\Event;
 use Illuminate\Support\Facades\DB;
 use App\Services\PaymentService;
 use Livewire\WithPagination;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
+use App\Models\Person;
+use App\Models\Beneficiary;
+use App\Models\Dependent;
+use App\Models\Member;
+use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 
 class ReviewEvents extends Component
 {
@@ -21,6 +30,11 @@ class ReviewEvents extends Component
               $event->person->update([
                     'deceased_at' => now(),
                     'status'      => 'deceased',
+                ]);
+
+                 $event->person->beneficiaries()->update([
+                    'percentage' => 0,
+                    'status'     => 'deceased', 
                 ]);
             $event->update(['status' => 'approved', 'approved_at' => now()]);
 

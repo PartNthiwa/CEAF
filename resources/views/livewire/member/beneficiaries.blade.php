@@ -153,23 +153,28 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     Select Dependent (Optional)
                 </label>
-          <select wire:model="selectedPerson" class="w-full rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-    <option value="">— Choose beneficiary or dependent —</option>
+            <select wire:model="selectedPerson" 
+                    class="w-full rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                <option value="">— Choose beneficiary or dependent —</option>
 
-    {{-- Existing beneficiaries --}}
-    @foreach($beneficiaries as $b)
-        <option value="beneficiary:{{ $b->id }}">
-            {{ $b->name }} (Existing Beneficiary)
-        </option>
-    @endforeach
+                {{-- Existing beneficiaries --}}
+                @foreach($beneficiaries as $b)
+                   <option value="beneficiary:{{ $b->id }}" @disabled($b->status === 'deceased' || $b->person?->deceased_at)>
+                        {{ $b->name }} (Existing Beneficiary)
+                        @if($b->status === 'deceased' || $b->person?->deceased_at)
+                            — Deceased
+                        @endif
+                    </option>
+                @endforeach
 
-    {{-- Dependents --}}
-    @foreach($dependents as $d)
-        <option value="dependent:{{ $d->id }}" @disabled($d->status === 'deceased')>
-            {{ $d->name }} (Dependent)
-        </option>
-    @endforeach
-</select>
+                {{-- Dependents (exclude deceased) --}}
+                @foreach($dependents->where('status', 'active') as $d)
+                    <option value="dependent:{{ $d->id }}">
+                        {{ $d->name }} (Dependent)
+                    </option>
+                @endforeach
+            </select>
+
 
             </div>
 

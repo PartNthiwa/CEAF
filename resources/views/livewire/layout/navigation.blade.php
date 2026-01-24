@@ -69,6 +69,14 @@ new class extends Component
                     >
                         Events
                     </x-nav-link>
+                
+                     <x-nav-link
+                        :href="route('member.event-history')"
+                        :active="request()->routeIs('member.event-history')"
+                        wire:navigate
+                    >
+                        Event History
+                    </x-nav-link>
 
                 </div>
 
