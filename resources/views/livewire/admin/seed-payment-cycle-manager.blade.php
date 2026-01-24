@@ -1,49 +1,47 @@
-<div class="p-6 bg-white rounded shadow">
-    <h2 class="text-xl font-bold mb-4">Seed Payment Cycle Manager ({{ $year }})</h2>
+<div class="p-6 bg-white rounded shadow space-y-4">
 
-    @if (session()->has('success'))
-        <div class="mb-4 text-green-600">{{ session('success') }}</div>
-    @endif
-    @if (session()->has('error'))
-        <div class="mb-4 text-red-600">{{ session('error') }}</div>
+    <h2 class="text-2xl font-bold mb-4">Create Seed Payment Cycle</h2>
+
+    @if(session()->has('success'))
+        <div class="p-3 bg-green-100 text-green-800 rounded">
+            {{ session('success') }}
+        </div>
     @endif
 
-    <div class="mb-4 flex space-x-2">
-        <button wire:click="createSeedCycle"
-                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            Create Seed Payment Cycle
+    <form wire:submit.prevent="createSeedCycle" class="space-y-4">
+        <div>
+            <label class="block font-medium">Year</label>
+            <input type="number" wire:model="year" class="border rounded px-3 py-2 w-full"/>
+            @error('year') <span class="text-red-600">{{ $message }}</span> @enderror
+        </div>
+
+        <div>
+            <label class="block font-medium">Amount Per Member</label>
+            <input type="number" wire:model="amount_per_member" class="border rounded px-3 py-2 w-full"/>
+            @error('amount_per_member') <span class="text-red-600">{{ $message }}</span> @enderror
+        </div>
+
+        <div>
+            <label class="block font-medium">Start Date</label>
+            <input type="date" wire:model="start_date" class="border rounded px-3 py-2 w-full"/>
+            @error('start_date') <span class="text-red-600">{{ $message }}</span> @enderror
+        </div>
+
+        <div>
+            <label class="block font-medium">Due Date</label>
+            <input type="date" wire:model="due_date" class="border rounded px-3 py-2 w-full"/>
+            @error('due_date') <span class="text-red-600">{{ $message }}</span> @enderror
+        </div>
+
+        <div>
+            <label class="block font-medium">Late Deadline</label>
+            <input type="date" wire:model="late_deadline" class="border rounded px-3 py-2 w-full"/>
+            @error('late_deadline') <span class="text-red-600">{{ $message }}</span> @enderror
+        </div>
+
+        <button class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+            Create Cycle
         </button>
+    </form>
 
-        <button wire:click="enforceLatePayments"
-                class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-            Enforce Late Payments
-        </button>
-    </div>
-
-    <h3 class="font-semibold mb-2">Existing Seed Cycles:</h3>
-
-    @if($cycles->isEmpty())
-        <p>No seed payment cycles yet.</p>
-    @else
-        <table class="w-full border">
-            <thead class="bg-gray-100">
-                <tr>
-                    <th class="border px-2 py-1">ID</th>
-                    <th class="border px-2 py-1">Amount/Member</th>
-                    <th class="border px-2 py-1">Status</th>
-                    <th class="border px-2 py-1">Paid Members</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($cycles as $cycle)
-                    <tr>
-                        <td class="border px-2 py-1">{{ $cycle->id }}</td>
-                        <td class="border px-2 py-1">KES {{ number_format($cycle->amount_per_member) }}</td>
-                        <td class="border px-2 py-1">{{ ucfirst($cycle->status) }}</td>
-                        <td class="border px-2 py-1">{{ $cycle->paid_count }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    @endif
 </div>

@@ -19,7 +19,7 @@ use App\Livewire\Admin\BeneficiaryRequests;
 use App\Livewire\Member\SubmitEvent;
 use App\Livewire\Admin\ReviewEvents;
 use App\Livewire\Member\EventHistory ;
-
+use App\Http\Controllers\PayPalController;
 /*
 |--------------------------------------------------------------------------
 | Public Routes
@@ -62,6 +62,10 @@ Route::middleware(['auth'])->prefix('member')->name('member.')->group(function (
 
     Route::get('/submit-event', SubmitEvent::class)->name('submit-event');
     Route::get('/event-history', EventHistory::class)->name('event-history');
+
+    Route::get('/paypal/success/{payment}',[PayPalController::class, 'success'])->name('paypal.success');
+    Route::get('/paypal/cancel/{payment}',[PayPalController::class, 'cancel'])->name('paypal.cancel');
+
 });
 
 Route::middleware(['auth'])->group(function () {

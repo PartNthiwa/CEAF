@@ -4,6 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Member;
+use App\Models\PaymentCycle;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
+use Exception;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PaymentReceived;
+use App\Models\Payment;
+
 
 class Payment extends Model
 {
@@ -20,9 +32,9 @@ class Payment extends Model
         'paid_at' => 'datetime',
     ];
 
-    public function paymentCycle(): BelongsTo
+   public function paymentCycle()
     {
-        return $this->belongsTo(PaymentCycle::class);
+        return $this->belongsTo(PaymentCycle::class, 'payment_cycle_id');
     }
 
     public function member(): BelongsTo
@@ -30,27 +42,45 @@ class Payment extends Model
         return $this->belongsTo(Member::class);
     }
 
-    public function isPaid(): bool
+
+    public function isLate()
+        {
+            return $this->status === 'pending' && now()->gt($this->cycle->late_deadline);
+        }
+   // Apply late fee
+    public function applyLateFee($percentage = 0.1)
     {
-        return $this->status === 'paid';
+        if ($this->isLate()) {
+            $this->update([
+                'status' => 'late',
+                'late_fee' => $this->amount_due * $percentage,
+            ]);
+        }
     }
 
-    public function calculateAmountDue(): int
+    // Mark as paid
+    public function markPaid()
     {
-        $amount = $this->amount_due;
+        $this->update([
+            'status' => 'paid',
+            'paid_at' => now(),
+            'late_fee' => 0,
+        ]);
+    }
 
-        $lateFeeType = $this->paymentCycle->late_fee_type ?? 'flat';
-        $lateFeeValue = $this->paymentCycle->late_fee_value ?? 0;
+    /* Accessor for late fee */
 
-        if ($this->status === 'pending' && now()->greaterThan($this->paymentCycle->due_date)) {
-            if ($lateFeeType === 'flat') {
-                $amount += $lateFeeValue;
-            } elseif ($lateFeeType === 'percentage') {
-                $amount += ceil($amount * ($lateFeeValue / 100));
-            }
+    public function getLateFeeAttribute($value)
+    {
+        if ($this->status === 'pending' && now()->gt($this->paymentCycle->late_deadline)) {
+            return $this->amount_due * 0.10; // 10% late fee
         }
 
-        return $amount;
+        return $value;
     }
-
+    public function getTotalDueAttribute()
+    {
+        return $this->amount_due + $this->late_fee;
+    }
+    
 }

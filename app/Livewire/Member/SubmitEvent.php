@@ -7,10 +7,12 @@ use Livewire\WithFileUploads;
 use App\Models\Person;
 use App\Models\Event;
 use Illuminate\Support\Facades\DB;
+use App\Livewire\Traits\RequiresActiveMembership;
 
 class SubmitEvent extends Component
 {
     use WithFileUploads;
+    use RequiresActiveMembership;
 
     public $person_id;
     public $death_cert;
