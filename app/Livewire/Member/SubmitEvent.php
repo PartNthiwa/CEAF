@@ -42,6 +42,15 @@ class SubmitEvent extends Component
 
         $member = auth()->user()->member;
 
+
+        if (in_array($member->membership_status, ['late', 'suspended', 'terminated'])) {
+        throw new \Exception(
+                'You cannot submit an event while your membership status is: ' .
+                strtoupper($member->membership_status)
+            );
+        }
+
+        
         $person = Person::alive()
                 ->where('id', $this->person_id)
                 ->where('member_id', $member->id)

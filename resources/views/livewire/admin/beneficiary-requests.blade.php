@@ -12,10 +12,10 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase">Member</th>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase">Submitted At</th>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase">Status</th>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase">Actions</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600">Member</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600">Submitted At</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600">Status</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600">Actions</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">

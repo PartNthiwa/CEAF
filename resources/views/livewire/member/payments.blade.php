@@ -1,18 +1,24 @@
 @php
-    $status = $memberStatus;
+    $status = $memberStatus; // from Livewire component
 @endphp
 
 <div class="p-6 bg-white rounded shadow space-y-4">
 
     <h2 class="text-2xl font-bold mb-4">My Payments</h2>
 
-    @if(in_array($status, ['late','suspended','terminated']))
+    {{-- Membership Warning Banner --}}
+    @if($status === 'active')
+        <div class="bg-green-100 text-green-700 p-3 rounded mb-4">
+            Your membership is <strong>Active</strong>.
+        </div>
+    @elseif(in_array($status, ['late','suspended','terminated']))
         <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
-            Your membership is <strong>{{ ucfirst($status) }}</strong>.
+            Your payment is <strong>{{ ucfirst($status) }}</strong>.
             Please clear outstanding payments to regain access.
         </div>
     @endif
 
+    {{-- Payments Table --}}
     <div class="overflow-x-auto">
         <table class="min-w-full border border-gray-200 rounded">
             <thead class="bg-gray-50">

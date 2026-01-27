@@ -15,6 +15,11 @@ use App\Models\Dependent;
 use App\Models\Member;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
+use App\Services\SeedPaymentService;
+use App\Services\ReplenishmentService;
+use App\Services\AuditLogService;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\EventApprovedMail;
 
 class ReviewEvents extends Component
 {
@@ -25,25 +30,46 @@ class ReviewEvents extends Component
     public function approve($eventId)
     {
         DB::transaction(function () use ($eventId) {
-            $event = Event::with('person')->findOrFail($eventId);
 
-              $event->person->update([
-                    'deceased_at' => now(),
-                    'status'      => 'deceased',
-                ]);
+            $event = Event::with(['person', 'member'])->findOrFail($eventId);
+            $member = $event->member;
 
-                 $event->person->beneficiaries()->update([
-                    'percentage' => 0,
-                    'status'     => 'deceased', 
-                ]);
-            $event->update(['status' => 'approved', 'approved_at' => now()]);
+            // Update person and beneficiaries
+            $event->person->update([
+                'deceased_at' => now(),
+                'status'      => 'deceased',
+            ]);
 
-            // Placeholder: trigger payments later
-            // PaymentService::handleApprovedEvent($event);
+            $event->person->beneficiaries()->update([
+                'percentage' => 0,
+                'status'     => 'deceased', 
+            ]);
+
+            // Handle payments
+            $approvedAmount = $event->amount; // assumed property
+            $currentYear = now()->year;
+
+            // Check seed fund
+            if (SeedPaymentService::hasSufficientBalance($approvedAmount, $currentYear)) {
+                SeedPaymentService::deductForEvent($event);
+            } else {
+                // Trigger replenishment if seed insufficient
+                ReplenishmentService::trigger($approvedAmount, $currentYear);
+            }
+
+            // Update event status
+            $event->update([
+                'status' => 'approved',
+                'approved_at' => now(),
+                'approved_amount' => $approvedAmount,
+                'paid_from_seed' => SeedPaymentService::hasSufficientBalance($approvedAmount, $currentYear),
+            ]);
+
+            // Optional: Audit logging here
         });
 
         session()->flash('success', 'Event approved successfully.');
-       $this->resetPage();
+        $this->resetPage();
     }
 
     public function reject($eventId)
@@ -56,7 +82,7 @@ class ReviewEvents extends Component
 
   public function render()
 {
-     $events = Event::with(['person', 'member', 'documents'])
+     $events = Event::with(['person', 'member', 'documents','paymentCycle'])
             ->when($this->search, function ($query) {
                 $query->whereHas('person', fn($q) =>
                     $q->where('first_name', 'like', "%{$this->search}%")

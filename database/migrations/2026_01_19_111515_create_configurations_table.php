@@ -13,14 +13,12 @@ return new class extends Migration
     {
        Schema::create('configurations', function (Blueprint $table) {
             $table->id();
-
             $table->year('year');
-            $table->string('key');
-            $table->string('value');
-
+            $table->decimal('amount_per_event', 10, 2); 
+            $table->integer('number_of_events');
             $table->timestamps();
 
-            $table->unique(['year', 'key']);
+            $table->unique('year');
         });
 
     }

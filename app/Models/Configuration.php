@@ -8,14 +8,15 @@ class Configuration extends Model
 {
     protected $fillable = [
         'year',
-        'key',
-        'value',
+       'amount_per_event',
+       'number_of_events',
     ];
 
-    public static function get(int $year, string $key, $default = null)
+    public static function getCurrentConfiguration()
     {
-        return static::where('year', $year)
-            ->where('key', $key)
-            ->value('value') ?? $default;
+        $currentYear = date('Y');
+        return self::where('year', $currentYear)->first();
     }
+
+    
 }

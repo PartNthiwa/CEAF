@@ -9,7 +9,7 @@ use App\Models\PaymentCycle;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
+
 use Illuminate\Support\Facades\Log;
 use Exception;
 use Illuminate\Support\Facades\Mail;
@@ -19,6 +19,14 @@ use App\Models\Payment;
 
 class Payment extends Model
 {
+    use HasFactory;
+
+    public const STATUS_PENDING   = 'pending';
+    public const STATUS_PAID      = 'paid';
+    public const STATUS_LATE      = 'late';
+    public const STATUS_DEFAULTED = 'defaulted';
+
+
     protected $fillable = [
         'payment_cycle_id',
         'member_id',
@@ -26,10 +34,14 @@ class Payment extends Model
         'late_fee',
         'paid_at',
         'status',
+        'marked_late_at',
+        'defaulted_at',
     ];
 
     protected $casts = [
         'paid_at' => 'datetime',
+        'marked_late_at' => 'datetime',
+        'defaulted_at' => 'datetime',
     ];
 
    public function paymentCycle()

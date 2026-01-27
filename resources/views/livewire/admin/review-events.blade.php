@@ -25,6 +25,8 @@
                     <th class="px-4 py-2 text-left">#</th>
                     <th class="px-4 py-2 text-left">Member</th>
                     <th class="px-4 py-2 text-left">Person</th>
+                    <th class="px-4 py-2 text-left">Event Type</th>
+                    <th class="px-4 py-2 text-left">Amount</th>
                     <th class="px-4 py-2 text-left">Status</th>
                     <th class="px-4 py-2 text-left">Submitted</th>
                     <th class="px-4 py-2 text-left">Actions</th>
@@ -32,35 +34,41 @@
             </thead>
 
             <tbody>
-               @forelse($events as $event)
-                <tr class="{{ $loop->even ? 'bg-gray-50' : 'bg-white' }}">
-                    <td class="px-4 py-2">{{ $events->firstItem() + $loop->index }}</td>
-                    <td class="px-4 py-2">{{ $event->member->user->name ?? 'N/A' }}</td>
-                    <td class="px-4 py-2">{{ $event->person->full_name ?? 'N/A' }}</td>
-                    <td class="px-4 py-2 capitalize">{{ $event->status }}</td>
-                    <td class="px-4 py-2">{{ $event->created_at->format('d M Y') }}</td>
-                    <td class="px-4 py-2 space-x-2 flex">
-                        @if($event->status === 'submitted' || $event->status === 'under_review')
-                            <button wire:click="approve({{ $event->id }})"
-                                    class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded">
-                                Approve
-                            </button>
-                            <button wire:click="reject({{ $event->id }})"
-                                    class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">
-                                Reject
-                            </button>
-                        @else
-                            <span class="text-gray-500">No actions</span>
-                        @endif
-                    </td>
-                </tr>
+                @forelse($events as $event)
+                    <tr class="{{ $loop->even ? 'bg-gray-50' : 'bg-white' }}">
+                        <td class="px-4 py-2">{{ $events->firstItem() + $loop->index }}</td>
+                        <td class="px-4 py-2">{{ $event->member->user->name ?? 'N/A' }}</td>
+                        <td class="px-4 py-2">{{ $event->person->full_name ?? 'N/A' }}</td>
+                        <td class="px-4 py-2 capitalize">
+                            {{ $event->payment_cycle_type ?? 'Seed' }}
+                        </td>
+                        <td class="px-4 py-2">
+                            KES {{ number_format($event->approved_amount ?? 0) }}
+                        </td>
+                        <td class="px-4 py-2 capitalize">{{ $event->status }}</td>
+                        <td class="px-4 py-2">{{ $event->created_at->format('d M Y') }}</td>
+                        <td class="px-4 py-2 space-x-2 flex">
+                            @if(in_array($event->status, ['submitted', 'under_review']))
+                                <button wire:click="approve({{ $event->id }})"
+                                        class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded">
+                                    Approve
+                                </button>
+                                <button wire:click="reject({{ $event->id }})"
+                                        class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">
+                                    Reject
+                                </button>
+                            @else
+                                <span class="text-gray-500">No actions</span>
+                            @endif
+                        </td>
+                    </tr>
                 @empty
-                <tr>
-                    <td colspan="6" class="px-4 py-3 text-center text-gray-500">
-                        No events found.
-                    </td>
-                </tr>
-@endforelse
+                    <tr>
+                        <td colspan="8" class="px-4 py-3 text-center text-gray-500">
+                            No events found.
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>

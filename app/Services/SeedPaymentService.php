@@ -6,6 +6,15 @@ use App\Models\PaymentCycle;
 use App\Models\Payment;
 use App\Models\Member;
 use Carbon\Carbon;
+use App\Models\Event;
+use Exception;
+use Illuminate\Support\Facades\DB;
+use Log;
+use Throwable;
+use App\Services\ReplenishmentService;
+use App\Models\AuditLog;
+use App\Models\Dependent;
+use App\Services\SeedPaymentService;
 
 class SeedPaymentService
 {
@@ -38,4 +47,73 @@ class SeedPaymentService
     }
 
     return $cycle;
-}}
+}
+
+    /** 
+     * 
+     * Returns the total amount collected for a specific seed payment cycle year -  PAID Only(e.g., 2023).
+     * 
+     * */
+    public static function totalCollected(int $year): float
+    {
+        return Payment::whereHas('paymentCycle', function ($q) use ($year) {
+                $q->where('type', 'seed')
+                  ->where('year', $year);
+            })
+            ->where('status', 'paid')
+            ->sum('amount_due');
+    }
+
+    /** 
+     * 
+     * Checks if there is sufficient balance in the seed fund for a given amount.
+     * 
+     * */
+    public static function hasSufficientBalance(float $amount, int $year): bool
+    {
+        return self::balance($year) >= $amount;
+    }
+
+    /** 
+     * 
+     * Deducts a specified amount from the seed fund for the current year.
+     * 
+     * */
+    public static function deductForEvent(Event $event): void
+    {
+        if ($event->paid_from_seed) {
+            return; // already deducted
+        }
+
+        $year = $event->approved_at->year;
+
+        if (! self::hasSufficientBalance($event->approved_amount, $year)) {
+            throw new \Exception('Insufficient seed fund balance.');
+        }
+
+        $event->update([
+            'paid_from_seed' => true,
+        ]);
+    }
+    /** 
+     * 
+     * Returns the total amount spent from the seed fund for approved events in a specific year.
+     * 
+     * */
+    public static function totalSpent(int $year): float
+    {
+        return Event::whereYear('approved_at', $year)
+            ->where('status', 'approved')
+            ->where('paid_from_seed', true)
+            ->sum('approved_amount');
+    }
+
+    /**
+     * Current available seed balance
+     */
+    public static function balance(int $year): float
+    {
+        return self::totalCollected($year) - self::totalSpent($year);
+    }
+
+}

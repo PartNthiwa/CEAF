@@ -1,9 +1,8 @@
 <div class="max-w-6xl mx-auto px-6 py-8 space-y-8">
 
-    {{-- Dashboard Header / Quick Actions --}}
+    {{-- Dashboard Header --}}
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <h1 class="text-2xl font-semibold text-gray-800">Dashboard</h1>
-
         <div class="flex flex-wrap gap-3">
             <a href="{{ route('member.payments') }}"
                class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg shadow-sm transition">
@@ -32,7 +31,7 @@
         {{-- Amount Due --}}
         <div class="bg-white rounded-xl shadow p-6 flex flex-col justify-between hover:shadow-md transition">
             <h3 class="text-lg font-semibold mb-2 text-gray-700">Amount Due</h3>
-            @if(!is_null($amountDue))
+            @if($amountDue > 0)
                 <span class="text-blue-700 text-xl font-bold">
                     KES {{ number_format($amountDue) }}
                 </span>
@@ -44,9 +43,9 @@
         {{-- Next Payment Deadline --}}
         <div class="bg-white rounded-xl shadow p-6 flex flex-col justify-between hover:shadow-md transition">
             <h3 class="text-lg font-semibold mb-2 text-gray-700">Next Payment Deadline</h3>
-            @if(!is_null($nextDeadline))
+            @if($nextDeadline)
                 <span class="text-gray-800 font-medium
-                    @if($nextDeadline && now()->gt(\Carbon\Carbon::parse($nextDeadline))) text-red-600 font-bold @endif
+                    @if(now()->gt(\Carbon\Carbon::parse($nextDeadline))) text-red-600 font-bold @endif
                 ">
                     {{ \Carbon\Carbon::parse($nextDeadline)->format('d M Y') }}
                 </span>
@@ -57,9 +56,10 @@
 
     </div>
 
-    {{-- Dependents Summary --}}
+    {{-- Dependents & Beneficiaries Summary --}}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
+        {{-- Dependents --}}
         <div class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition">
             <h3 class="text-lg font-semibold text-gray-700 mb-4">Dependents</h3>
 
@@ -84,7 +84,7 @@
             </a>
         </div>
 
-        {{-- Beneficiaries Summary --}}
+        {{-- Beneficiaries --}}
         <div class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition">
             <h3 class="text-lg font-semibold text-gray-700 mb-4">Beneficiaries</h3>
 

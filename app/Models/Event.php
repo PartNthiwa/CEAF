@@ -13,6 +13,9 @@ class Event extends Model
         'person_id',
         'status',
         'approved_at',
+        'approved_amount',
+        'paid_from_seed',
+        'requires_replenishment',
     ];
 
     protected $casts = [

@@ -24,12 +24,27 @@ class Payments extends Component
     public function mount()
     {
         $member = Auth::user()->member;
+       
+       $payments = Auth::user()->member->payments()
+            ->with('paymentCycle')
+            ->get()
+            ->sortByDesc(function($payment) {
+                return $payment->paymentCycle->due_date;
+            });
 
-        $this->payments = Payment::with('paymentCycle')
-            ->where('member_id', $member->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+         foreach ($payments as $payment) {
+                if ($payment->status === 'pending' && now()->gt($payment->paymentCycle->late_deadline)) {
+                    $payment->update([
+                        'status' => 'late',
+                        'late_fee' => $payment->amount_due * 0.10,
+                    ]);
+                }
+
+                MembershipStatusService::sync($member);
+            }
+          $this->payments = $payments->fresh();
     }
+
 
     public function totalDue($payment)
     {
@@ -71,8 +86,6 @@ class Payments extends Component
 
         session()->flash('error', 'Unable to initiate PayPal payment.');
     }
-
-
    public function render()
     {
         return view('livewire.member.payments', [

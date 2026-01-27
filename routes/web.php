@@ -20,6 +20,10 @@ use App\Livewire\Member\SubmitEvent;
 use App\Livewire\Admin\ReviewEvents;
 use App\Livewire\Member\EventHistory ;
 use App\Http\Controllers\PayPalController;
+use App\Livewire\Admin\ManageCeafUsers;
+use App\Models\Ceaf;
+use App\Livewire\Admin\Auth\Login;
+use App\Livewire\Admin\MembersList;
 /*
 |--------------------------------------------------------------------------
 | Public Routes
@@ -31,25 +35,28 @@ Route::view('/', 'welcome');
 | Authenticated Entry Point
 |--------------------------------------------------------------------------
 */
+
+Route::get('/admin/login', Login::class)->name('admin.login');
+
 Route::middleware(['auth'])->get('/dashboard', function () {
 
     $user = auth()->user();
 
-    if ($user->role === 'admin') {
+    $ceafUser = Ceaf::where('email', $user->email)->first();
+
+    if ($ceafUser && $ceafUser->role === 'admin') {
         return redirect()->route('admin.dashboard');
     }
 
     return redirect()->route('member.dashboard');
 
 })->name('dashboard');
-
-
 /*
 |--------------------------------------------------------------------------
 | Member Routes
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth' ])->group(function () {
     Route::get('/member/dashboard', MemberDashboard::class)->name('member.dashboard');
     Route::get('/profile', function () {return view('profile'); })->name('profile');
 });
@@ -68,7 +75,7 @@ Route::middleware(['auth'])->prefix('member')->name('member.')->group(function (
 
 });
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', ])->group(function () {
     Route::get('/dependent/{dependentId}/profile', DependentProfile::class)
         ->name('dependents.profile');
 });
@@ -79,7 +86,7 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'admin'])
+Route::middleware(['auth:ceaf'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
@@ -90,12 +97,28 @@ Route::middleware(['auth', 'admin'])
         Route::get('/payments', PaymentsManager::class)->name('payments');
         Route::get('/dependents', DependentsManager::class)->name('dependents');
         Route::get('/beneficiaries', BeneficiariesManager::class)->name('beneficiaries');
-    
+        Route::get('/show', AdminDashboard::class)->name('show');
         Route::get('/review-events', ReviewEvents::class)->name('review-events');
         Route::get('/review-events/{eventId}', ReviewEvents::class)->name('review-events.detail');
 
+
+        
+        Route::get('/settings', AdminDashboard::class)->name('settings');
+        Route::get('/users', ManageCeafUsers::class)->name('manage-ceaf-users');
+        Route::get('/reports', AdminDashboard::class)->name('reports');
+
+
+        Route::get('/mlist', MembersList::class)->name('members-list');
+
         });
 
-    
+    Route::post('/admin/logout', function () {
+    Auth::guard('ceaf')->logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+
+    return redirect()->route('admin.login');
+})->name('admin.logout');
+
 
 require __DIR__.'/auth.php';

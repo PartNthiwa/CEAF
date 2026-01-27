@@ -40,6 +40,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+         'ceaf' => [
+            'driver' => 'session',
+            'provider' => 'ceaf',
+        ],
     ],
 
     /*
@@ -65,6 +70,10 @@ return [
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
 
+        'ceaf' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Ceaf::class,
+        ],
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',

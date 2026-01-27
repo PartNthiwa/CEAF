@@ -12,10 +12,12 @@ class Member extends Model
         'user_id',
         'membership_status',
         'join_date',
+        'status_changed_at',
     ];
 
     protected $casts = [
         'join_date' => 'date',
+        'status_changed_at' => 'datetime',
     ];
 
     // ─── Relationships ─────────────────────────────

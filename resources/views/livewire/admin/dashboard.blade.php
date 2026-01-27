@@ -1,92 +1,169 @@
-<div class="p-6 bg-white rounded shadow">
+<div class="p-6 bg-gray-50 min-h-screen space-y-8">
 
-    <!-- Current Page Title -->
-    <div class="mb-6 border-b pb-4 text-sm text-gray-700">
-        Home &gt;
-        @if(request()->routeIs('admin.dashboard'))
-            Member Overview
-        @elseif(request()->routeIs('admin.configuration'))
-            Configuration Settings
-        @elseif(request()->routeIs('admin.seed-cycle'))
-            Payment Cycle Management
-        @elseif(request()->routeIs('admin.beneficiary.requests'))
-            Beneficiary Requests
-        @else
-            Admin Panel
-        @endif
+    {{-- Breadcrumb / Page Title --}}
+    <div class="text-sm text-gray-600 border-b pb-3">
+        Home &gt; <span class="font-semibold text-gray-800">Admin Dashboard</span>
     </div>
 
-    <!-- Stats Cards -->
-    @if(request()->routeIs('admin.dashboard'))
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div class="bg-gray-100 p-4 rounded text-center">
-            <div class="text-gray-500 text-sm">Total Members</div>
-            <div class="text-xl font-bold">{{ $totalMembers }}</div>
+    {{-- MEMBER HEALTH --}}
+    <section>
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Member Health</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+            <x-admin.stat title="Total Members" :value="$totalMembers" class="card" />
+            <x-admin.stat title="Active" :value="$activeMembers" color="green" class="card" />
+            <x-admin.stat title="Late" :value="$lateMembers" color="yellow" class="card" />
+            <x-admin.stat title="Suspended" :value="$suspendedMembers" color="red" class="card" />
+            <x-admin.stat title="Terminated" :value="$terminatedMembers" color="gray" class="card" />
         </div>
-        <div class="bg-green-100 p-4 rounded text-center">
-            <div class="text-gray-500 text-sm">Active</div>
-            <div class="text-xl font-bold">{{ $activeMembers }}</div>
+    </section>
+
+    {{-- FINANCIAL HEALTH --}}
+    <section>
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">
+            Financial Health ({{ now()->year }})
+        </h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <x-admin.stat
+                title="Seed Balance"
+                :value="'$' . number_format($seedBalance)"
+                color="blue"
+                class="card"
+            />
+
+            <x-admin.stat
+                title="Seed Spent"
+                :value="'$' . number_format($seedSpent)"
+                class="card"
+            />
+
+            <x-admin.stat
+                title="Open Replenishments"
+                :value="$openReplenishments"
+                color="yellow"
+                class="card"
+            />
         </div>
-        <div class="bg-yellow-100 p-4 rounded text-center">
-            <div class="text-gray-500 text-sm">Late</div>
-            <div class="text-xl font-bold">{{ $lateMembers }}</div>
-        </div>
-        <div class="bg-red-100 p-4 rounded text-center">
-            <div class="text-gray-500 text-sm">Suspended</div>
-            <div class="text-xl font-bold">{{ $suspendedMembers }}</div>
-        </div>
-    </div>
+    </section>
+
+    {{-- ACTION REQUIRED --}}
+    @if($alerts->isNotEmpty())
+    <section class="bg-yellow-50 border border-yellow-200 rounded-lg p-5">
+        <h3 class="text-sm font-semibold text-yellow-800 mb-3">
+            Action Required
+        </h3>
+
+        <ul class="space-y-2 text-sm text-yellow-900">
+            @foreach($alerts as $alert)
+                <li>• {{ $alert }}</li>
+            @endforeach
+        </ul>
+    </section>
     @endif
 
-    <!-- Optional Button -->
-    @if(request()->routeIs('admin.dashboard'))
-    <div class="mb-4">
-        <button wire:click="enforceLatePayments"
-                class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-            Enforce Late Payments
-        </button>
-    </div>
-    @endif
+    {{-- MEMBERS TABLE --}}
+    <section class="bg-white border rounded-lg shadow-md">
+        <div class="p-4 border-b">
+            <h2 class="text-lg font-semibold text-gray-800">Members</h2>
+        </div>
 
-    <!-- Members Table -->
-    <div class="overflow-x-auto">
-        <table class="min-w-full bg-white border border-gray-200 rounded">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">#</th>
-                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Name</th>
-                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Email</th>
-                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Status</th>
-                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Joined</th>
-                </tr>
-            </thead>
-           <tbody>
-                @foreach($members as $index => $member)
-                <tr class="{{ $index % 2 === 0 ? 'bg-gray-50' : 'bg-white' }}">
-                    <td class="px-4 py-2 text-sm">{{ $members->firstItem() + $index }}</td>
-                    <td class="px-4 py-2 text-sm">{{ $member->user->name }}</td>
-                    <td class="px-4 py-2 text-sm">{{ $member->user->email }}</td>
-                    <td class="px-4 py-2 text-sm">
-                        @if($member->membership_status === 'active')
-                            <span class="text-green-600 font-semibold">Active</span>
-                        @elseif($member->membership_status === 'late')
-                            <span class="text-yellow-600 font-semibold">Late</span>
-                        @elseif($member->membership_status === 'suspended')
-                            <span class="text-red-600 font-semibold">Suspended</span>
-                        @elseif($member->membership_status === 'terminated')
-                            <span class="text-gray-600 font-semibold">Terminated</span>
-                        @endif
-                    </td>
-                    <td class="px-4 py-2 text-sm">{{ $member->join_date->format('M d, Y') }}</td>
-                </tr>
-                @endforeach
-            </tbody>
+        <div class="hidden md:block overflow-x-auto">
+            <!-- Desktop -->
+            <table class="min-w-full text-sm table-auto">
+                <thead class="bg-gray-50 text-gray-600">
+                    <tr>
+                        <th class="px-6 py-3 text-left font-medium">#</th>
+                        <th class="px-6 py-3 text-left font-medium">Name</th>
+                        <th class="px-6 py-3 text-left font-medium">Email</th>
+                        <th class="px-6 py-3 text-left font-medium">Status</th>
+                        <th class="px-6 py-3 text-left font-medium">Amount Due</th>
+                        <th class="px-6 py-3 text-left font-medium">Next Deadline</th>
+                        <th class="px-6 py-3 text-left font-medium">Action</th>
+                    </tr>
+                </thead>
 
-        </table>
-    </div>
+                <tbody class="text-gray-700">
+                    @foreach($members as $index => $member)
+                        <tr class="border-t hover:bg-gray-100 transition-all duration-300">
+                            <td class="px-6 py-2">
+                                {{ $members->firstItem() + $index }}
+                            </td>
+                            <td class="px-6 py-2 font-medium">
+                                {{ $member->user->name }}
+                            </td>
+                            <td class="px-6 py-2">
+                                {{ $member->user->email }}
+                            </td>
+                            <td class="px-6 py-2 capitalize">
+                                {{ $member->membership_status }}
+                            </td>
+                            <td class="px-6 py-2">
+                                {{ $member->amount_due > 0 ? '$'.number_format($member->amount_due) : '—' }}
+                            </td>
+                            <td class="px-6 py-2">
+                                {{ $member->next_deadline?->format('d M Y') ?? '—' }}
+                            </td>
+                            <td class="px-6 py-2">
+                                <a href="{{ route('admin.show', $member) }}"
+                                   class="text-blue-600 hover:underline font-semibold">
+                                    View
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
 
-    <!-- Pagination -->
-    <div class="mt-4">
-        {{ $members->links() }}
-    </div>
+        <div class="md:hidden">
+            <!-- Mobile Cards -->
+            @foreach($members as $index => $member)
+                <div class="p-4 border-b">
+                    <div class="flex justify-between items-center">
+                        <div class="font-medium text-gray-800">
+                            {{ $members->firstItem() + $index }}. {{ $member->user->name }}
+                        </div>
+                        <a href="{{ route('admin.show', $member) }}" class="text-blue-600 hover:underline">
+                            View
+                        </a>
+                    </div>
+                    <div class="text-gray-600 text-sm mt-2">
+                        <div>Email: {{ $member->user->email }}</div>
+                        <div>Status: {{ $member->membership_status }}</div>
+                        <div>Amount Due: {{ $member->amount_due > 0 ? '$'.number_format($member->amount_due) : '—' }}</div>
+                        <div>Next Deadline: {{ $member->next_deadline?->format('d M Y') ?? '—' }}</div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
+        <div class="p-4">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-3">
+                <div>
+                    <span class="text-sm text-gray-600">
+                        Showing {{ $members->firstItem() }} to {{ $members->lastItem() }} of {{ $members->total() }} members
+                    </span>
+                </div>
+             <div class="px-4 py-4 border-t">
+                    <div class="text-sm font-medium">{{ auth()->user()->name }}</div>
+                    <div class="text-xs text-gray-400 truncate">{{ auth()->user()->email }}</div>
+
+                    <form method="POST" action="{{ route('admin.logout') }}" class="mt-3">
+                        @csrf
+                        <button type="submit" class="w-full text-left text-red-500 hover:underline">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+
+                <div>
+                    {{ $members->links() }}
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
+
+
+a
