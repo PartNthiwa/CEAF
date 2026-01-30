@@ -81,7 +81,7 @@ class SubmitEvent extends Component
             ]);
         });
 
-        session()->flash('success', 'Event submitted successfully.');
+        session()->flash('success', 'Death\Event has submitted successfully.');
         $this->reset();
     }
 

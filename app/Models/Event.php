@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+
 class Event extends Model
 {
     protected $fillable = [
@@ -19,6 +20,7 @@ class Event extends Model
     ];
 
     protected $casts = [
+        'approved_amount' => 'decimal:2',
         'approved_at' => 'datetime',
     ];
 
@@ -40,5 +42,21 @@ class Event extends Model
     public function isApproved(): bool
     {
         return $this->status === 'approved';
+    }
+
+    public function details()
+    {
+        return $this->hasOne(EventDetail::class);
+    }
+
+    public function coverImage()
+    {
+        return $this->hasOne(EventDocument::class)
+            ->where('type', 'image');
+    }
+
+    public function paymentCycle()
+    {
+        return $this->hasOne(PaymentCycle::class,'id');
     }
 }

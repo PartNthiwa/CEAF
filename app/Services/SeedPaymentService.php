@@ -61,7 +61,7 @@ class SeedPaymentService
                   ->where('year', $year);
             })
             ->where('status', 'paid')
-            ->sum('amount_due');
+            ->sum('amount_paid');
     }
 
     /** 
@@ -69,10 +69,18 @@ class SeedPaymentService
      * Checks if there is sufficient balance in the seed fund for a given amount.
      * 
      * */
-    public static function hasSufficientBalance(float $amount, int $year): bool
+  public static function hasSufficientBalance(float $amount, int $year): bool
     {
-        return self::balance($year) >= $amount;
+        $balance = self::balance($year);
+        Log::info("Checking seed balance for $year: available $balance, required $amount");
+        return $balance >= $amount;
     }
+
+
+
+
+
+
 
     /** 
      * 

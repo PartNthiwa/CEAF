@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Auth\Events\Login;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -26,6 +28,14 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+
+       Event::listen(Login::class, function (Login $event) {
+            // \Log::info('Login event fired for user: '.$event->user->id);
+            $event->user->forceFill([
+                'last_login_at' => now(),
+            ])->save();
+        });
+
         $this->configureActions();
         $this->configureViews();
         $this->configureRateLimiting();

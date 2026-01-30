@@ -13,11 +13,15 @@ class Member extends Model
         'membership_status',
         'join_date',
         'status_changed_at',
+        'member_number',
+        'approved_at',
+        'approved_by',
     ];
 
     protected $casts = [
         'join_date' => 'date',
         'status_changed_at' => 'datetime',
+          'approved_at' => 'datetime',
     ];
 
     // ─── Relationships ─────────────────────────────

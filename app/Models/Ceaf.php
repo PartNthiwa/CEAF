@@ -16,6 +16,7 @@ class Ceaf extends Authenticatable
     use HasFactory;
 
     protected $table = 'ceaf';
+
     protected $fillable = [
         'name',
         'email',
@@ -23,7 +24,12 @@ class Ceaf extends Authenticatable
         'password',
     ];
 
+
+    protected $casts = [
+            'last_login_at' => 'datetime',
+        ];
+
        protected $hidden = [
-        'password',
-    ];
+            'password',
+        ];
 }

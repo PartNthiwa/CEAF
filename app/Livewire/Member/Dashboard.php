@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
 use App\Models\Dependent;
 use App\Models\Beneficiary;
+use App\Models\EventDetail;
 use App\Models\User;
 use App\Models\Person;
 use App\Models\Event;
@@ -36,21 +37,60 @@ class Dashboard extends Component
     public $dependentsCount;
     public $activeDependents;
     public $deceasedDependents;
+    public $statusUi;
 
     public $beneficiariesCount;
     public $pendingBeneficiaryChanges;
-
+    public $approvedEvents;
     public function mount()
     {
         $member = auth()->user()->member;
 
         $this->membershipStatus = $member->membership_status ?? 'unknown';
 
-        // Calculate total amount due from pending and late payments
-         $this->amountDue = $member->payments()
-            ->whereIn('status', ['pending', 'late'])
-            ->sum('amount_due');
+        //Ui Ststus Map
+        $this->statusUi = match ($this->membershipStatus) {
+                'active' => [
+                    'label' => 'Active',
+                    'class' => 'bg-green-600',
+                    'description' => 'Your membership is in good standing.',
+                ],
 
+                'late' => [
+                    'label' => 'Action required',
+                    'class' => 'bg-amber-500',
+                    'description' => 'Payment overdue or pending requirements.',
+                ],
+
+                'suspended' => [
+                    'label' => 'Suspended',
+                    'class' => 'bg-red-600',
+                    'description' => 'Access is restricted until issues are resolved.',
+                ],
+
+                'terminated' => [
+                    'label' => 'Terminated',
+                    'class' => 'bg-gray-700',
+                    'description' => 'Membership has been permanently closed.',
+                ],
+
+                default => [
+                    'label' => 'Unknown',
+                    'class' => 'bg-gray-400',
+                    'description' => 'Status could not be determined.',
+                ],
+            };
+
+        // Calculate total amount due from pending and late payments
+        $this->amountDue = $member->payments()
+                ->whereIn('status', ['pending', 'late'])
+                ->sum(DB::raw('amount_due - amount_paid'));
+         $this->approvedEvents = Event::where('status', 'approved')
+            ->whereHas('details', function ($query) {
+                $query->where('event_date', '>', now());
+            })
+            ->with('details') 
+            ->get();
         // Determine next payment deadline 
         $nextPayment = Payment::query()
             ->where('payments.member_id', $member->id)
@@ -74,23 +114,14 @@ class Dashboard extends Component
             ->where('status', 'pending')->count();
     }
 
-   public function render()
+  public function render()
     {
-        $user = auth()->user();
-
-        $dependents = $user->dependents()->latest()->paginate(5);
+        $dependents = auth()->user()->member->dependents()->latest()->paginate(5);
 
         return view('livewire.member.dashboard', [
-            'membershipStatus' => $user->membership_status,
-            'amountDue' => $user->amount_due,
-            'nextDeadline' => $user->next_deadline,
             'dependents' => $dependents,
-            'dependentsCount' => $user->dependents()->count(),
-            'activeDependents' => $user->dependents()->where('status', 'active')->count(),
-            'deceasedDependents' => $user->dependents()->where('status', 'deceased')->count(),
-            'beneficiariesCount' => $user->beneficiaries()->count(),
-            'pendingBeneficiaryChanges' => $user->beneficiaryChangeRequests()->where('status', 'pending')->count(),
         ])->layout('layouts.app');
     }
+
 
 }

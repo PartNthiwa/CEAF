@@ -5,10 +5,12 @@
 
 <link rel="icon"  href="{{ asset('images/ceaflogo.png') }}" sizes="any">
 <link rel="icon"  href="{{ asset('images/ceaflogo.png') }}" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<!-- <link rel="apple-touch-icon" href="/apple-touch-icon.png"> -->
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<meta name="csrf-token" content="{{ csrf_token() }}">
 
+@livewireStyles
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 @fluxAppearance

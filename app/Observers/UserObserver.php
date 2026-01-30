@@ -12,11 +12,14 @@ class UserObserver
      */
     public function created(User $user): void
     {
-         Member::create([
-                'user_id' => $user->id,
-                'membership_status' => 'active',
-                'join_date' => now(),
-            ]);
+        Member::create([
+            'user_id' => $user->id,
+            'membership_status' => 'pending',
+            'join_date' => now(),
+            'approved_at' => null,
+            'approved_by' => null,
+            'member_number' => null,
+        ]);
     }
 
     /**

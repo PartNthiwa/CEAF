@@ -5,6 +5,10 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\AdminOnly;
 use App\Http\Middleware\CheckCeafUserRole;
+use App\Http\Middleware\EnsureValidInvitationForRegistration;
+use App\Http\Middleware\EnsureMemberApproved;
+
+
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,6 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => AdminOnly::class,
              'check.ceaf.role' => CheckCeafUserRole::class,
+                 'invite.required' => EnsureValidInvitationForRegistration::class,
+                   'member.approved' => EnsureMemberApproved::class,
         ]);
     })
     ->withMiddleware(function (Middleware $middleware): void {

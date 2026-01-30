@@ -3,314 +3,292 @@
 <head>
     @include('partials.head')
     <title>Admin Panel</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
 
 @php
     abort_unless(auth()->check(), 401);
+
+    /**
+     * Sleek BRIGHT theme:
+     * Header: sky
+     * Sidebar: white
+     * Main: light slate
+     *
+     * No JS. Dropdowns use <details>.
+     *
+     * Sidebar behavior:
+     * - FIXED on desktop (stays in place)
+     * - Sidebar can scroll internally if menu is long
+     * - Main content scrolls normally
+     */
 @endphp
 
-<body class="bg-gray-100 font-sans min-h-screen">
+<body class="bg-slate-50 min-h-screen">
+<div class="min-h-screen flex flex-col">
 
-<div x-data="{ open: false }" class="min-h-screen">
-
-    {{-- DESKTOP SIDEBAR --}}
-    <aside class="hidden lg:flex fixed inset-y-0 left-0 w-64 bg-gray-800 text-gray-200 border-r flex-col z-40">
-        <div class="px-6 py-4 flex items-center justify-between border-b bg-blue-900">
-            <x-app-logo />
-        </div>
-
-        <nav class="flex-1 px-4 py-6 space-y-2">
-
-            {{-- Dashboard --}}
-            <a href="{{ route('admin.dashboard') }}"
-               class="flex items-center px-3 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('admin.dashboard') ? 'bg-green-600 font-semibold' : '' }}">
-                Dashboard
-            </a>
-
-            {{-- Members --}}
-            <div x-data="{ open: {{ request()->routeIs('admin.members') || request()->routeIs('admin.dependents') || request()->routeIs('admin.beneficiaries') ? 'true' : 'false' }} }">
-                <button @click="open = !open"
-                        class="flex items-center justify-between w-full px-3 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('admin.members') || request()->routeIs('admin.dependents') || request()->routeIs('admin.beneficiaries') ? 'bg-green-600 font-semibold' : '' }}">
-                    Members
-                    <i :class="{'rotate-90': open}" class="fas fa-chevron-right"></i>
-                </button>
-
-                <div x-show="open" x-transition class="ml-4 mt-1 space-y-1">
-                  
-                    <a href="{{ route('admin.members-list') }}"
-                            class="block px-3 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('admin.members-list') ? 'bg-green-700 font-semibold' : '' }}">
-                        Members List
-                    </a>
-                    <a href="{{ route('admin.dependents') }}"
-                       class="block px-3 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('admin.dependents') ? 'bg-green-700 font-semibold' : '' }}">
-                        Dependents
-                    </a>
-
-                    <a href="{{ route('admin.beneficiaries') }}"
-                       class="block px-3 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('admin.beneficiaries') ? 'bg-green-700 font-semibold' : '' }}">
-                        Beneficiaries
-                    </a>
+    {{-- GLOBAL HEADER --}}
+    <header class="sticky top-0 z-50 bg-sky-700 text-white border-b border-sky-800">
+        <div class="px-6 py-5 flex items-center justify-between">
+            {{-- Logo / Title --}}
+            <div class="flex items-center gap-3">
+                <x-app-logo class="w-10 h-10" />
+                <div class="leading-tight">
+                    <div class="font-bold text-lg tracking-tight">CEAF Admin</div>
+                    <div class="text-xs text-white/80">Bereavement Registry</div>
                 </div>
             </div>
 
-            {{-- Beneficiaries --}}
-            <div x-data="{ open: {{ request()->routeIs('admin.beneficiary.list') || request()->routeIs('admin.beneficiary.requests') ? 'true' : 'false' }} }">
-                <button @click="open = !open"
-                        class="flex items-center justify-between w-full px-3 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('admin.beneficiary.list') || request()->routeIs('admin.beneficiary.requests') ? 'bg-green-600 font-semibold' : '' }}">
-                    Beneficiaries
-                    <i :class="{'rotate-90': open}" class="fas fa-chevron-right"></i>
-                </button>
+            <div class="flex items-center gap-3">
 
-                <div x-show="open" x-transition class="ml-4 mt-1 space-y-1">
-                  
-                    <a href="{{ route('admin.beneficiary.requests') }}"
-                       class="block px-3 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('admin.beneficiary.requests') ? 'bg-green-700 font-semibold' : '' }}">
-                        Request List
-                    </a>
-                </div>
-            </div>
+                {{-- Account dropdown (Desktop) — interactive, no JS --}}
+                <details class="relative hidden lg:block group">
+                    <summary
+                        class="list-none cursor-pointer select-none px-3 py-2 rounded-2xl
+                               hover:bg-white/10 transition flex items-center gap-3
+                               focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40
+                               group-open:bg-white/10 group-open:ring-2 group-open:ring-white/20"
+                    >
+                        {{-- Avatar --}}
+                        <div class="relative shrink-0">
+                            <div class="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center font-bold">
+                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                            </div>
+                            <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 ring-2 ring-sky-700"></span>
+                        </div>
 
-            {{-- Accounting --}}
-            <div x-data="{ open: {{ request()->routeIs('admin.payments') || request()->routeIs('admin.seed-cycle') ? 'true' : 'false' }} }">
-                <button @click="open = !open"
-                        class="flex items-center justify-between w-full px-3 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('admin.payments') || request()->routeIs('admin.seed-cycle') ? 'bg-green-600 font-semibold' : '' }}">
-                    Accounting
-                    <i :class="{'rotate-90': open}" class="fas fa-chevron-right"></i>
-                </button>
+                        {{-- User text --}}
+                        <div class="leading-tight text-left">
+                            <div class="text-sm font-semibold">{{ auth()->user()->name }}</div>
+                            <div class="text-xs text-white/80">{{ auth()->user()->email }}</div>
+                        </div>
 
-                <div x-show="open" x-transition class="ml-4 mt-1 space-y-1">
-                    <a href="{{ route('admin.payments') }}"
-                       class="block px-3 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('admin.payments') ? 'bg-green-700 font-semibold' : '' }}">
-                        Payments
-                    </a>
+                        {{-- Caret --}}
+                        <svg
+                            class="w-4 h-4 text-white/80 ml-2 transition-transform duration-200 group-open:rotate-180"
+                            viewBox="0 0 20 20" fill="currentColor"
+                        >
+                            <path fill-rule="evenodd"
+                                  d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
+                                  clip-rule="evenodd" />
+                        </svg>
+                    </summary>
 
-                    <a href="{{ route('admin.seed-cycle') }}"
-                       class="block px-3 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('admin.seed-cycle') ? 'bg-green-700 font-semibold' : '' }}">
-                        Seed cycle
-                    </a>
-                </div>
-            </div>
+                    <div class="absolute right-0 mt-3 w-80 bg-white text-slate-700 border border-gray-200 rounded-2xl shadow-xl overflow-hidden">
+                        <div class="px-4 py-3 border-b bg-slate-50">
+                            <div class="text-sm font-semibold">{{ auth()->user()->name }}</div>
+                            <div class="text-xs text-slate-500 truncate">{{ auth()->user()->email }}</div>
+                        </div>
 
-            {{-- Settings --}}
-            <div x-data="{ open: {{ request()->routeIs('admin.settings') || request()->routeIs('admin.seed-cycle') ? 'true' : 'false' }} }">
-                <button @click="open = !open"
-                        class="flex items-center justify-between w-full px-3 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('admin.settings') || request()->routeIs('admin.seed-cycle') ? 'bg-green-600 font-semibold' : '' }}">
-                   Setting
-                    <i :class="{'rotate-90': open}" class="fas fa-chevron-right"></i>
-                </button>
-
-                <div x-show="open" x-transition class="ml-4 mt-1 space-y-1">
-                    <a href="{{ route('admin.configuration') }}"
-                       class="block px-3 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('admin.configuration') ? 'bg-green-700 font-semibold' : '' }}">
-                        Configuration
-                    </a>
-                </div>
-            </div>
-
-        </nav>
-
-        <div class="px-6 py-4 border-t">
-            <div class="text-sm font-medium">{{ auth()->user()->name }}</div>
-            <div class="text-xs text-gray-500 truncate">{{ auth()->user()->email }}</div>
-            <form method="POST" action="{{ route('logout') }}" class="mt-2">
-                @csrf
-                <button type="submit" class="text-red-500 text-sm hover:underline w-full text-left">
-                    Logout
-                </button>
-            </form>
-        </div>
-    </aside>
-
-    {{-- MOBILE MENU --}}
-    <div class="lg:hidden">
-        <div class="flex items-center justify-between bg-gray-800 text-gray-200 px-4 py-3">
-            <button @click="open = true" class="text-white">
-                <i class="fas fa-bars"></i>
-            </button>
-
-            <div class="flex items-center gap-2">
-                <x-app-logo class="w-8 h-8" />
-                <span class="font-bold">Admin</span>
-            </div>
-        </div>
-
-        <div x-show="open" x-cloak class="fixed inset-0 z-50 flex">
-            <div class="fixed inset-0 bg-black opacity-50" @click="open = false"></div>
-
-            <div class="relative w-72 bg-gray-800 text-white min-h-screen">
-                <div class="flex items-center justify-between px-4 py-4 border-b">
-                    <div class="font-bold">Menu</div>
-                    <button @click="open = false" class="text-white">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-
-                <nav class="px-4 py-4 space-y-2">
-
-                    <a href="{{ route('admin.dashboard') }}" @click="open=false"
-                       class="block px-3 py-2 rounded text-white hover:bg-gray-700 {{ request()->routeIs('admin.dashboard') ? 'bg-green-600 font-semibold' : '' }}">
-                        Dashboard
-                    </a>
-
-                    {{-- Members Dropdown --}}
-                    <div x-data="{ openSub: {{ request()->routeIs('admin.members') || request()->routeIs('admin.dependents') || request()->routeIs('admin.beneficiaries') ? 'true' : 'false' }} }">
-                        <button @click="openSub = !openSub"
-                                class="flex items-center justify-between w-full px-3 py-2 rounded hover:bg-gray-700">
-                            Members
-                            <i :class="{'rotate-90': openSub}" class="fas fa-chevron-right"></i>
-                        </button>
-
-                        <div x-show="openSub" x-transition class="ml-4 mt-1 space-y-1">
-                           
-                            <a href="{{ route('admin.dependents') }}" @click="open=false"
-                               class="block px-3 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('admin.dependents') ? 'bg-green-600 font-semibold' : '' }}">
-                                Dependents
+                        <div class="p-2 space-y-1">
+                            <a href="{{ route('admin.users') }}"
+                               class="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 transition">
+                                <span>Users</span>
+                                <span class="text-slate-400">→</span>
                             </a>
-
-                            <a href="{{ route('admin.beneficiaries') }}" @click="open=false"
-                               class="block px-3 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('admin.beneficiaries') ? 'bg-green-600 font-semibold' : '' }}">
-                                Beneficiaries
+                            <a href="{{ route('admin.reports') }}"
+                               class="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 transition">
+                                <span>Reports</span>
+                                <span class="text-slate-400">→</span>
+                            </a>
+                            <a href="{{ route('admin.configuration') }}"
+                               class="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 transition">
+                                <span>Settings</span>
+                                <span class="text-slate-400">→</span>
                             </a>
                         </div>
-                    </div>
 
-                    {{-- Beneficiaries Dropdown --}}
-                    <div x-data="{ openSub2: {{ request()->routeIs('admin.beneficiary.list') || request()->routeIs('admin.beneficiary.requests') ? 'true' : 'false' }} }">
-                        <button @click="openSub2 = !openSub2"
-                                class="flex items-center justify-between w-full px-3 py-2 rounded hover:bg-gray-700">
-                            Beneficiaries
-                            <i :class="{'rotate-90': openSub2}" class="fas fa-chevron-right"></i>
-                        </button>
-
-                        <div x-show="openSub2" x-transition class="ml-4 mt-1 space-y-1">
-                           
-
-                            <a href="{{ route('admin.beneficiary.requests') }}" @click="open=false"
-                               class="block px-3 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('admin.beneficiary.requests') ? 'bg-green-600 font-semibold' : '' }}">
-                                Request List
-                            </a>
+                        <div class="border-t p-2">
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit"
+                                        class="w-full text-left px-3 py-2 rounded-xl text-red-600 hover:bg-red-50 font-semibold transition">
+                                    Logout
+                                </button>
+                            </form>
                         </div>
                     </div>
+                </details>
 
-                    {{-- Accounting --}}
-                    <div x-data="{ openSub3: {{ request()->routeIs('admin.payments') || request()->routeIs('admin.seed-cycle') ? 'true' : 'false' }} }">
-                        <button @click="openSub3 = !openSub3"
-                                class="flex items-center justify-between w-full px-3 py-2 rounded hover:bg-gray-700">
-                            Accounting
-                            <i :class="{'rotate-90': openSub3}" class="fas fa-chevron-right"></i>
-                        </button>
+                {{-- Mobile menu (No JS) --}}
+                <details class="lg:hidden relative">
+                    <summary class="list-none cursor-pointer select-none px-3 py-2 rounded-2xl hover:bg-white/10 transition">
+                        ☰
+                    </summary>
 
-                        <div x-show="openSub3" x-transition class="ml-4 mt-1 space-y-1">
-                            <a href="{{ route('admin.payments') }}" @click="open=false"
-                               class="block px-3 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('admin.payments') ? 'bg-green-600 font-semibold' : '' }}">
-                                Payments
-                            </a>
-
-                            <a href="{{ route('admin.seed-cycle') }}" @click="open=false"
-                               class="block px-3 py-2 rounded hover:bg-gray-700 {{ request()->routeIs('admin.seed-cycle') ? 'bg-green-600 font-semibold' : '' }}">
-                                Seed cycle
-                            </a>
+                    <div class="absolute right-0 mt-3 w-80 max-w-[92vw] bg-white text-slate-700 border border-gray-200 rounded-2xl shadow-xl overflow-hidden">
+                        <div class="px-4 py-3 border-b bg-slate-50">
+                            <div class="text-sm font-semibold">{{ auth()->user()->name }}</div>
+                            <div class="text-xs text-slate-500 truncate">{{ auth()->user()->email }}</div>
                         </div>
+
+                        <nav class="p-3 space-y-2">
+                            <a href="{{ route('admin.dashboard') }}"
+                               class="block px-3 py-2 rounded-xl hover:bg-slate-50 transition
+                                      {{ request()->routeIs('admin.dashboard') ? 'bg-sky-50 text-sky-700 font-semibold' : '' }}">
+                                Dashboard
+                            </a>
+
+                            <details class="rounded-xl border border-gray-200 overflow-hidden">
+                                <summary class="list-none cursor-pointer select-none px-3 py-2 hover:bg-slate-50 transition flex items-center justify-between">
+                                    <span class="font-medium">Members</span>
+                                    <span class="text-slate-500">▸</span>
+                                </summary>
+                                <div class="px-2 py-2 space-y-1 bg-slate-50">
+                                    <a href="{{ route('admin.members-list') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Listing</a>
+                                    <a href="{{ route('admin.invite-members') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Invites</a>
+                                    <a href="{{ route('admin.approve-members') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Pending Approval</a>
+                                    <a href="{{ route('admin.dependents') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Dependents</a>
+                                    <a href="{{ route('admin.beneficiaries') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Beneficiaries</a>
+                                </div>
+                            </details>
+
+                            <details class="rounded-xl border border-gray-200 overflow-hidden">
+                                <summary class="list-none cursor-pointer select-none px-3 py-2 hover:bg-slate-50 transition flex items-center justify-between">
+                                    <span class="font-medium">Events</span>
+                                    <span class="text-slate-500">▸</span>
+                                </summary>
+                                 <div class="px-2 py-2 space-y-1 bg-slate-50">
+                                    <a href="{{ route('admin.beneficiary.requests') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Change requests</a>
+                                </div>
+                                <div class="px-2 py-2 space-y-1 bg-slate-50">
+                                    <a href="{{ route('admin.review-events') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Review Events</a>
+                                </div>
+                            </details>
+
+                            <details class="rounded-xl border border-gray-200 overflow-hidden">
+                                <summary class="list-none cursor-pointer select-none px-3 py-2 hover:bg-slate-50 transition flex items-center justify-between">
+                                    <span class="font-medium">Accounting</span>
+                                    <span class="text-slate-500">▸</span>
+                                </summary>
+                                <div class="px-2 py-2 space-y-1 bg-slate-50">
+                                    <a href="{{ route('admin.payments') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Payments</a>
+                                    <a href="{{ route('admin.seed-cycle') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Seed Cycle</a>
+                                </div>
+                            </details>
+
+                            <details class="rounded-xl border border-gray-200 overflow-hidden">
+                                <summary class="list-none cursor-pointer select-none px-3 py-2 hover:bg-slate-50 transition flex items-center justify-between">
+                                    <span class="font-medium">Settings</span>
+                                    <span class="text-slate-500">▸</span>
+                                </summary>
+                                <div class="px-2 py-2 space-y-1 bg-slate-50">
+                                    <a href="{{ route('admin.configuration') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Configuration</a>
+                                    <a href="{{ route('admin.users') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Users</a>
+                                    <a href="{{ route('admin.reports') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Reports</a>
+                                </div>
+                            </details>
+
+                            <form method="POST" action="{{ route('logout') }}" class="pt-1">
+                                @csrf
+                                <button type="submit"
+                                        class="w-full text-left px-3 py-2 rounded-xl text-red-600 hover:bg-red-50 font-semibold transition">
+                                    Logout
+                                </button>
+                            </form>
+                        </nav>
                     </div>
-                                       
+                </details>
 
-                </nav>
+            </div>
+        </div>
+    </header>
 
-                 <div class="px-4 py-4 border-t">
-                <div class="text-sm font-medium">{{ auth()->user()->name }}</div>
-                <div class="text-xs text-gray-400 truncate">{{ auth()->user()->email }}</div>
+    {{-- BODY --}}
+    <div class="flex flex-1">
 
-                <form method="POST" action="{{ route('admin.logout') }}" class="mt-3">
+        {{-- DESKTOP SIDEBAR (FIXED) --}}
+        <aside
+            class="hidden lg:block fixed left-0 top-[88px] w-72 bg-white text-slate-700 border-r border-gray-200
+                   h-[calc(100vh-88px)] overflow-y-auto"
+        >
+            <nav class="px-4 py-6 space-y-3">
+
+                <a href="{{ route('admin.dashboard') }}"
+                   class="block px-4 py-3 rounded-2xl hover:bg-slate-50 transition
+                          {{ request()->routeIs('admin.dashboard') ? 'bg-sky-600 text-white font-semibold shadow-sm' : '' }}">
+                    Dashboard
+                </a>
+
+                {{-- Members --}}
+                <details class="rounded-2xl overflow-hidden border border-gray-200"
+                         {{ request()->routeIs('admin.members-list','admin.invite-members','admin.approve-members','admin.dependents','admin.beneficiaries') ? 'open' : '' }}>
+                    <summary class="list-none cursor-pointer select-none px-4 py-3 hover:bg-slate-50 transition flex items-center justify-between">
+                        <span class="font-semibold">Members</span>
+                        <span class="text-slate-500">▸</span>
+                    </summary>
+                    <div class="px-3 py-3 space-y-2 bg-slate-50">
+                        <a href="{{ route('admin.members-list') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Listing</a>
+                        <a href="{{ route('admin.invite-members') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Invites</a>
+                        <a href="{{ route('admin.approve-members') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Pending Approval</a>
+                        <a href="{{ route('admin.dependents') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Dependents</a>
+                        <a href="{{ route('admin.beneficiaries') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Beneficiaries</a>
+                    </div>
+                </details>
+
+                {{-- Events --}}
+                <details class="rounded-2xl overflow-hidden border border-gray-200"
+                         {{ request()->routeIs('admin.review-events') ? 'open' : '' }}>
+                    <summary class="list-none cursor-pointer select-none px-4 py-3 hover:bg-slate-50 transition flex items-center justify-between">
+                        <span class="font-semibold">Events</span>
+                        <span class="text-slate-500">▸</span>
+                    </summary>
+                     <div class="px-2 py-2 space-y-1 bg-slate-50">
+                        <a href="{{ route('admin.beneficiary.requests') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Change requests</a>
+                    </div>
+                    <div class="px-3 py-3 space-y-2 bg-slate-50">
+                        <a href="{{ route('admin.review-events') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Review Events</a>
+                    </div>
+                   
+                </details>
+
+                {{-- Accounting --}}
+                <details class="rounded-2xl overflow-hidden border border-gray-200"
+                         {{ request()->routeIs('admin.payments','admin.seed-cycle') ? 'open' : '' }}>
+                    <summary class="list-none cursor-pointer select-none px-4 py-3 hover:bg-slate-50 transition flex items-center justify-between">
+                        <span class="font-semibold">Accounting</span>
+                        <span class="text-slate-500">▸</span>
+                    </summary>
+                    <div class="px-3 py-3 space-y-2 bg-slate-50">
+                        <a href="{{ route('admin.payments') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Payments</a>
+                        <a href="{{ route('admin.seed-cycle') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Seed Cycle</a>
+                    </div>
+                </details>
+
+                {{-- Settings --}}
+                <details class="rounded-2xl overflow-hidden border border-gray-200"
+                         {{ request()->routeIs('admin.configuration','admin.users','admin.reports') ? 'open' : '' }}>
+                    <summary class="list-none cursor-pointer select-none px-4 py-3 hover:bg-slate-50 transition flex items-center justify-between">
+                        <span class="font-semibold">Settings</span>
+                        <span class="text-slate-500">▸</span>
+                    </summary>
+                    <div class="px-3 py-3 space-y-2 bg-slate-50">
+                        <a href="{{ route('admin.configuration') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Configuration</a>
+                        <a href="{{ route('admin.users') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Users</a>
+                        <a href="{{ route('admin.reports') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Reports</a>
+                    </div>
+                </details>
+
+                {{-- Quick Logout (optional) --}}
+                <form method="POST" action="{{ route('logout') }}" class="pt-1">
                     @csrf
-                    <button type="submit" class="w-full text-left text-red-500 hover:underline">
+                    <button type="submit"
+                            class="w-full text-left px-4 py-3 rounded-2xl text-red-600 hover:bg-red-50 font-semibold transition border border-gray-200">
                         Logout
                     </button>
                 </form>
-            </div>
-            </div>
-        </div>
-    </div>
 
-    {{-- MAIN CONTENT --}}
-    <div class="flex flex-col lg:ml-64">
-        <livewire:layout.admin-nav />
+            </nav>
+        </aside>
 
-        <main class="flex-1 p-6 mx-auto w-full">
+        {{-- MAIN CONTENT (offset for fixed sidebar on desktop) --}}
+        <main class="flex-1 p-6 lg:ml-72 bg-gray-300 ">
             {{ $slot }}
         </main>
 
-        <div class="fixed bottom-6 right-6 z-50">
-    <div class="relative">
-        <!-- FAB button -->
-        <button id="fabButton" class="bg-blue-600 text-white p-6 rounded-full shadow-lg hover:bg-blue-800 transition-all transform hover:scale-110 focus:outline-none">
-            <i class="fas fa-cogs"></i>
-        </button>
-        
-        <!-- Quick Action Menu -->
-        <div id="fabMenu" class="absolute bottom-16 right-0 bg-white shadow-lg rounded-lg w-48 hidden">
-            <ul class="space-y-2 p-3">
-                <li>
-                    <a href="{{ route('admin.review-events') }}"
-                       class="text-blue-600 hover:bg-gray-100 w-full text-left py-2 px-4 rounded-md">
-                        Alerts
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.review-events') }}"
-                       class="text-blue-600 hover:bg-gray-100 w-full text-left py-2 px-4 rounded-md">
-                        Payments
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.review-events') }}"
-                       class="text-blue-600 hover:bg-gray-100 w-full text-left py-2 px-4 rounded-md">
-                        Create Seed Cycle
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('admin.review-events') }}"
-                       class="text-blue-600 hover:bg-gray-100 w-full text-left py-2 px-4 rounded-md">
-                        Review Events
-                    </a>
-                </li>
-                <li>
-                    <button wire:click="enforceLatePayments"
-                            class="text-blue-600 hover:bg-gray-100 w-full text-left py-2 px-4 rounded-md">
-                        Enforce Late Payments
-                    </button>
-                </li>
-                <li>
-                    <a href="{{ route('admin.review-events') }}"
-                       class="text-blue-600 hover:bg-gray-100 w-full text-left py-2 px-4 rounded-md">
-                        Generate Reports
-                    </a>
-                </li>
-            </ul>
-        </div>
     </div>
 </div>
 
-<script>
-    // Toggle FAB menu visibility
-    document.getElementById('fabButton').addEventListener('click', function(event) {
-        const menu = document.getElementById('fabMenu');
-        menu.classList.toggle('hidden');
-        event.stopPropagation(); // Prevent event from bubbling up to the document
-    });
+@livewireScripts
 
-    // Hide FAB menu when clicking outside of the FAB or menu
-    document.addEventListener('click', function(event) {
-        const menu = document.getElementById('fabMenu');
-        const fabButton = document.getElementById('fabButton');
-        
-        // Check if the click was outside the FAB button and the menu
-        if (!fabButton.contains(event.target) && !menu.contains(event.target)) {
-            menu.classList.add('hidden');
-        }
-    });
-</script>
-
-    </script>
 </body>
 </html>
