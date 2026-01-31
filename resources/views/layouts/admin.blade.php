@@ -7,20 +7,6 @@
 
 @php
     abort_unless(auth()->check(), 401);
-
-    /**
-     * Sleek BRIGHT theme:
-     * Header: sky
-     * Sidebar: white
-     * Main: light slate
-     *
-     * No JS. Dropdowns use <details>.
-     *
-     * Sidebar behavior:
-     * - FIXED on desktop (stays in place)
-     * - Sidebar can scroll internally if menu is long
-     * - Main content scrolls normally
-     */
 @endphp
 
 <body class="bg-slate-50 min-h-screen">
@@ -40,7 +26,7 @@
 
             <div class="flex items-center gap-3">
 
-                {{-- Account dropdown (Desktop) — interactive, no JS --}}
+                {{-- Account dropdown (Desktop) — NO JS --}}
                 <details class="relative hidden lg:block group">
                     <summary
                         class="list-none cursor-pointer select-none px-3 py-2 rounded-2xl
@@ -63,10 +49,8 @@
                         </div>
 
                         {{-- Caret --}}
-                        <svg
-                            class="w-4 h-4 text-white/80 ml-2 transition-transform duration-200 group-open:rotate-180"
-                            viewBox="0 0 20 20" fill="currentColor"
-                        >
+                        <svg class="w-4 h-4 text-white/80 ml-2 transition-transform duration-200 group-open:rotate-180"
+                             viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
                                   d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
                                   clip-rule="evenodd" />
@@ -85,11 +69,52 @@
                                 <span>Users</span>
                                 <span class="text-slate-400">→</span>
                             </a>
-                            <a href="{{ route('admin.reports') }}"
-                               class="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 transition">
-                                <span>Reports</span>
-                                <span class="text-slate-400">→</span>
-                            </a>
+
+                            {{-- Reports dropdown (NO JS) --}}
+                            <details class="rounded-xl border border-gray-200 overflow-hidden"
+                                     {{ request()->routeIs('admin.reports.*') ? 'open' : '' }}>
+                                <summary class="list-none cursor-pointer select-none px-3 py-2 hover:bg-slate-50 transition flex items-center justify-between">
+                                    <span class="font-medium">Reports</span>
+                                    <span class="text-slate-500">▸</span>
+                                </summary>
+
+                                <div class="px-2 py-2 space-y-1 bg-slate-50">
+                                    <a href="{{ route('admin.reports.payments') }}"
+                                       class="block px-3 py-2 rounded-xl hover:bg-white transition
+                                              {{ request()->routeIs('admin.reports.payments*') ? 'bg-indigo-100 font-semibold' : '' }}">
+                                        Payments Report
+                                    </a>
+
+                                    <a href="{{ route('admin.reports.members') }}"
+                                   class="block px-3 py-2 rounded-xl hover:bg-slate-50 transition
+                                          {{ request()->routeIs('admin.reports.members*') ? 'bg-indigo-100 font-semibold' : '' }}">
+                                    Members Report
+                                </a>
+
+                                 <a href="{{ route('admin.reports.events') }}"
+                                    class="block px-3 py-2 rounded-xl hover:bg-slate-50 transition
+                                            {{ request()->routeIs('admin.reports.events*') ? 'bg-indigo-100 font-semibold' : '' }}">
+                                        Events Report
+                                    </a>
+                                 <a href="{{ route('admin.reports.dependents') }}"
+                                   class="block px-3 py-2 rounded-xl hover:bg-slate-50 transition
+                                          {{ request()->routeIs('admin.reports.dependents*') ? 'bg-indigo-100 font-semibold' : '' }}">
+                                    Dependents Report
+                                </a>
+
+                                 <a href="{{ route('admin.reports.beneficiaries') }}"
+                                    class="block px-3 py-2 rounded-xl hover:bg-slate-50 transition
+                                            {{ request()->routeIs('admin.reports.beneficiaries*') ? 'bg-indigo-100 font-semibold' : '' }}">
+                                      Beneficiriries Report
+                                    </a>
+                                     <a href="{{ route('admin.reports.seed_funds') }}"
+                                    class="block px-3 py-2 rounded-xl hover:bg-slate-50 transition
+                                            {{ request()->routeIs('admin.reports.seed_funds*') ? 'bg-indigo-100 font-semibold' : '' }}">
+                                      Seed Report
+                                    </a>
+                                </div>
+                            </details>
+
                             <a href="{{ route('admin.configuration') }}"
                                class="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 transition">
                                 <span>Settings</span>
@@ -109,7 +134,7 @@
                     </div>
                 </details>
 
-                {{-- Mobile menu (No JS) --}}
+                {{-- Mobile menu (NO JS) --}}
                 <details class="lg:hidden relative">
                     <summary class="list-none cursor-pointer select-none px-3 py-2 rounded-2xl hover:bg-white/10 transition">
                         ☰
@@ -128,7 +153,8 @@
                                 Dashboard
                             </a>
 
-                            <details class="rounded-xl border border-gray-200 overflow-hidden">
+                            <details class="rounded-xl border border-gray-200 overflow-hidden"
+                                     {{ request()->routeIs('admin.members-list','admin.invite-members','admin.approve-members','admin.dependents','admin.beneficiaries') ? 'open' : '' }}>
                                 <summary class="list-none cursor-pointer select-none px-3 py-2 hover:bg-slate-50 transition flex items-center justify-between">
                                     <span class="font-medium">Members</span>
                                     <span class="text-slate-500">▸</span>
@@ -142,20 +168,20 @@
                                 </div>
                             </details>
 
-                            <details class="rounded-xl border border-gray-200 overflow-hidden">
+                            <details class="rounded-xl border border-gray-200 overflow-hidden"
+                                     {{ request()->routeIs('admin.review-events','admin.beneficiary.requests') ? 'open' : '' }}>
                                 <summary class="list-none cursor-pointer select-none px-3 py-2 hover:bg-slate-50 transition flex items-center justify-between">
                                     <span class="font-medium">Events</span>
                                     <span class="text-slate-500">▸</span>
                                 </summary>
-                                 <div class="px-2 py-2 space-y-1 bg-slate-50">
-                                    <a href="{{ route('admin.beneficiary.requests') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Change requests</a>
-                                </div>
                                 <div class="px-2 py-2 space-y-1 bg-slate-50">
+                                    <a href="{{ route('admin.beneficiary.requests') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Change requests</a>
                                     <a href="{{ route('admin.review-events') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Review Events</a>
                                 </div>
                             </details>
 
-                            <details class="rounded-xl border border-gray-200 overflow-hidden">
+                            <details class="rounded-xl border border-gray-200 overflow-hidden"
+                                     {{ request()->routeIs('admin.payments','admin.seed-cycle') ? 'open' : '' }}>
                                 <summary class="list-none cursor-pointer select-none px-3 py-2 hover:bg-slate-50 transition flex items-center justify-between">
                                     <span class="font-medium">Accounting</span>
                                     <span class="text-slate-500">▸</span>
@@ -166,7 +192,8 @@
                                 </div>
                             </details>
 
-                            <details class="rounded-xl border border-gray-200 overflow-hidden">
+                            <details class="rounded-xl border border-gray-200 overflow-hidden"
+                                     {{ request()->routeIs('admin.configuration','admin.users','admin.reports.*') ? 'open' : '' }}>
                                 <summary class="list-none cursor-pointer select-none px-3 py-2 hover:bg-slate-50 transition flex items-center justify-between">
                                     <span class="font-medium">Settings</span>
                                     <span class="text-slate-500">▸</span>
@@ -174,11 +201,58 @@
                                 <div class="px-2 py-2 space-y-1 bg-slate-50">
                                     <a href="{{ route('admin.configuration') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Configuration</a>
                                     <a href="{{ route('admin.users') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Users</a>
-                                    <a href="{{ route('admin.reports') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Reports</a>
+
+                                    {{-- Reports dropdown (NO JS) --}}
+                                    <details class="rounded-xl border border-gray-200 overflow-hidden"
+                                             {{ request()->routeIs('admin.reports.*') ? 'open' : '' }}>
+                                        <summary class="list-none cursor-pointer select-none px-3 py-2 hover:bg-white transition flex items-center justify-between">
+                                            <span class="font-medium">Reports</span>
+                                            <span class="text-slate-500">▸</span>
+                                        </summary>
+
+                                        <div class="px-2 py-2 space-y-1 bg-white">
+                                            <a href="{{ route('admin.reports.payments') }}"
+                                               class="block px-3 py-2 rounded-xl hover:bg-slate-50 transition
+                                                      {{ request()->routeIs('admin.reports.payments*') ? 'bg-indigo-100 font-semibold' : '' }}">
+                                                Payments Report
+                                            </a>
+                                             <a href="{{ route('admin.reports.members') }}"
+                                            class="block px-3 py-2 rounded-xl hover:bg-slate-50 transition
+                                                    {{ request()->routeIs('admin.reports.members*') ? 'bg-indigo-100 font-semibold' : '' }}">
+                                                Members Report
+                                            </a>
+                                               <a href="{{ route('admin.reports.events') }}"
+                                            class="block px-3 py-2 rounded-xl hover:bg-slate-50 transition
+                                                    {{ request()->routeIs('admin.reports.events*') ? 'bg-indigo-100 font-semibold' : '' }}">
+                                                Events Report
+                                            </a>
+                                           <a href="{{ route('admin.reports.events') }}"
+                                    class="block px-3 py-2 rounded-xl hover:bg-slate-50 transition
+                                            {{ request()->routeIs('admin.reports.events*') ? 'bg-indigo-100 font-semibold' : '' }}">
+                                        Events Report
+                                    </a>
+                                 <a href="{{ route('admin.reports.dependents') }}"
+                                   class="block px-3 py-2 rounded-xl hover:bg-slate-50 transition
+                                          {{ request()->routeIs('admin.reports.dependents*') ? 'bg-indigo-100 font-semibold' : '' }}">
+                                    Dependents Report
+                                </a>
+
+                                 <a href="{{ route('admin.reports.beneficiaries') }}"
+                                    class="block px-3 py-2 rounded-xl hover:bg-slate-50 transition
+                                            {{ request()->routeIs('admin.reports.beneficiaries*') ? 'bg-indigo-100 font-semibold' : '' }}">
+                                      Beneficiriries Report
+                                    </a>
+                                    <a href="{{ route('admin.reports.seed_funds') }}"
+                                    class="block px-3 py-2 rounded-xl hover:bg-slate-50 transition
+                                            {{ request()->routeIs('admin.reports.seed_funds*') ? 'bg-indigo-100 font-semibold' : '' }}">
+                                      Seed Report
+                                    </a>
+                                        </div>
+                                    </details>
                                 </div>
                             </details>
 
-                            <form method="POST" action="{{ route('logout') }}" class="pt-1">
+                            <form method="POST" action="{{ route('admin.logout') }}" class="pt-1">
                                 @csrf
                                 <button type="submit"
                                         class="w-full text-left px-3 py-2 rounded-xl text-red-600 hover:bg-red-50 font-semibold transition">
@@ -227,18 +301,15 @@
 
                 {{-- Events --}}
                 <details class="rounded-2xl overflow-hidden border border-gray-200"
-                         {{ request()->routeIs('admin.review-events') ? 'open' : '' }}>
+                         {{ request()->routeIs('admin.review-events','admin.beneficiary.requests') ? 'open' : '' }}>
                     <summary class="list-none cursor-pointer select-none px-4 py-3 hover:bg-slate-50 transition flex items-center justify-between">
                         <span class="font-semibold">Events</span>
                         <span class="text-slate-500">▸</span>
                     </summary>
-                     <div class="px-2 py-2 space-y-1 bg-slate-50">
-                        <a href="{{ route('admin.beneficiary.requests') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Change requests</a>
-                    </div>
                     <div class="px-3 py-3 space-y-2 bg-slate-50">
+                        <a href="{{ route('admin.beneficiary.requests') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Change requests</a>
                         <a href="{{ route('admin.review-events') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Review Events</a>
                     </div>
-                   
                 </details>
 
                 {{-- Accounting --}}
@@ -256,19 +327,64 @@
 
                 {{-- Settings --}}
                 <details class="rounded-2xl overflow-hidden border border-gray-200"
-                         {{ request()->routeIs('admin.configuration','admin.users','admin.reports') ? 'open' : '' }}>
+                         {{ request()->routeIs('admin.configuration','admin.users','admin.reports.*') ? 'open' : '' }}>
                     <summary class="list-none cursor-pointer select-none px-4 py-3 hover:bg-slate-50 transition flex items-center justify-between">
                         <span class="font-semibold">Settings</span>
                         <span class="text-slate-500">▸</span>
                     </summary>
+
                     <div class="px-3 py-3 space-y-2 bg-slate-50">
                         <a href="{{ route('admin.configuration') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Configuration</a>
                         <a href="{{ route('admin.users') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Users</a>
-                        <a href="{{ route('admin.reports') }}" class="block px-3 py-2 rounded-xl hover:bg-white transition">Reports</a>
+
+                        {{-- Reports dropdown (replaces broken route('admin.reports')) --}}
+                        <details class="rounded-xl border border-gray-200 overflow-hidden"
+                                 {{ request()->routeIs('admin.reports.*') ? 'open' : '' }}>
+                            <summary class="list-none cursor-pointer select-none px-3 py-2 hover:bg-white transition flex items-center justify-between">
+                                <span class="font-semibold">Reports</span>
+                                <span class="text-slate-500">▸</span>
+                            </summary>
+
+                            <div class="px-2 py-2 space-y-1 bg-white">
+                                <a href="{{ route('admin.reports.payments') }}"
+                                   class="block px-3 py-2 rounded-xl hover:bg-slate-50 transition
+                                          {{ request()->routeIs('admin.reports.payments*') ? 'bg-indigo-100 font-semibold' : '' }}">
+                                    Payments Report
+                                </a>
+
+                                <a href="{{ route('admin.reports.members') }}"
+                                   class="block px-3 py-2 rounded-xl hover:bg-slate-50 transition
+                                          {{ request()->routeIs('admin.reports.members*') ? 'bg-indigo-100 font-semibold' : '' }}">
+                                    Members Report
+                                </a>
+
+                                 <a href="{{ route('admin.reports.events') }}"
+                                    class="block px-3 py-2 rounded-xl hover:bg-slate-50 transition
+                                            {{ request()->routeIs('admin.reports.events*') ? 'bg-indigo-100 font-semibold' : '' }}">
+                                        Events Report
+                                    </a>
+                                 <a href="{{ route('admin.reports.dependents') }}"
+                                   class="block px-3 py-2 rounded-xl hover:bg-slate-50 transition
+                                          {{ request()->routeIs('admin.reports.dependents*') ? 'bg-indigo-100 font-semibold' : '' }}">
+                                    Dependents Report
+                                </a>
+
+                                 <a href="{{ route('admin.reports.beneficiaries') }}"
+                                    class="block px-3 py-2 rounded-xl hover:bg-slate-50 transition
+                                            {{ request()->routeIs('admin.reports.beneficiaries*') ? 'bg-indigo-100 font-semibold' : '' }}">
+                                      Beneficiriries Report
+                                    </a>
+                                     <a href="{{ route('admin.reports.seed_funds') }}"
+                                    class="block px-3 py-2 rounded-xl hover:bg-slate-50 transition
+                                            {{ request()->routeIs('admin.reports.seed_funds*') ? 'bg-indigo-100 font-semibold' : '' }}">
+                                      Seed Report
+                                    </a>
+                            </div>
+                        </details>
                     </div>
                 </details>
 
-                {{-- Quick Logout (optional) --}}
+                {{-- Quick Logout --}}
                 <form method="POST" action="{{ route('logout') }}" class="pt-1">
                     @csrf
                     <button type="submit"
@@ -280,15 +396,18 @@
             </nav>
         </aside>
 
-        {{-- MAIN CONTENT (offset for fixed sidebar on desktop) --}}
-        <main class="flex-1 p-6 lg:ml-72 bg-gray-300 ">
-            {{ $slot }}
+        {{-- MAIN CONTENT --}}
+        <main class="flex-1 p-6 lg:ml-72 bg-gray-300">
+            @hasSection('content')
+                @yield('content')
+            @else
+                {{ $slot ?? '' }}
+            @endif
         </main>
 
     </div>
 </div>
 
-@livewireScripts
-
+    @livewireScripts
 </body>
 </html>

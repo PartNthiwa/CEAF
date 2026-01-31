@@ -31,7 +31,15 @@ use App\Livewire\Admin\InviteMembers;
 
 use App\Livewire\Admin\ApproveMembers;
 
+use App\Http\Controllers\PaymentsReportController;
+use App\Http\Controllers\DependentsReportController;
+use App\Http\Controllers\MembersReportController;
+use  App\Http\Controllers\SeedFundsReportController;
+use App\Http\Controllers\EventsReportController;
 
+
+
+use App\Http\Controllers\BeneficiariesReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -110,6 +118,8 @@ Route::middleware(['auth', ])->group(function () {
         ->name('dependents.profile');
 });
 
+
+
 /*
 |--------------------------------------------------------------------------
 | Admin Routes
@@ -162,4 +172,33 @@ Route::middleware(['auth:ceaf'])
         })->name('admin.logout');
 
 
+
+Route::middleware(['auth:ceaf'])
+    ->prefix('admin/reports')
+    ->name('admin.reports.')
+    ->group(function () {
+
+        //Payments Reports
+        Route::get('/payments', [PaymentsReportController::class, 'index'])->name('payments');
+        Route::get('/payments/export', [PaymentsReportController::class, 'export'])->name('payments.export');
+
+        //Memebrs Reports
+        Route::get('/members', [MembersReportController::class, 'index'])->name('members');
+        Route::get('/members/export', [MembersReportController::class, 'export'])->name('members.export');
+        //Evenst Reports
+        Route::get('/events', [EventsReportController::class, 'index'])->name('events');
+        Route::get('/events/export', [EventsReportController::class, 'export'])->name('events.export');
+    
+       //Beneficiriries Report
+        Route::get('/beneficiaries', [BeneficiariesReportController::class, 'index'])->name('beneficiaries');
+        Route::get('/beneficiaries/export', [BeneficiariesReportController::class, 'export']) ->name('beneficiaries.export');
+        //Dependendts Report
+        Route::get('/dependents', [DependentsReportController::class, 'index']) ->name('dependents');
+        Route::get('/dependents/export', [DependentsReportController::class, 'export']) ->name('dependents.export');
+        
+        //funsds report
+        Route::get('/seed-funds', [SeedFundsReportController::class, 'index'])->name('seed_funds');
+        Route::get('/seed-funds/export', [SeedFundsReportController::class, 'export'])->name('seed_funds.export');
+
+        });
 require __DIR__.'/auth.php';
